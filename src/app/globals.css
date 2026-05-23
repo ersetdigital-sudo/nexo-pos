@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@layer base {
+  body {
+    @apply bg-surface text-text font-sans antialiased;
+  }
+}
+
+@layer components {
+  .btn-brutal {
+    @apply inline-flex items-center justify-center px-4 py-2 font-bold border-2 border-text 
+           shadow-brutal active:shadow-none active:translate-x-1 active:translate-y-1 
+           transition-all duration-100 cursor-pointer select-none;
+  }
+  .btn-brutal-primary {
+    @apply btn-brutal bg-primary text-text hover:bg-yellow-300;
+  }
+  .btn-brutal-secondary {
+    @apply btn-brutal bg-secondary text-white hover:bg-indigo-700;
+  }
+  .btn-brutal-danger {
+    @apply btn-brutal bg-danger text-white hover:bg-red-700;
+  }
+  .btn-brutal-success {
+    @apply btn-brutal bg-success text-white hover:bg-green-700;
+  }
+  .card-brutal {
+    @apply border-2 border-text bg-white shadow-brutal p-4 rounded-none;
+  }
+  .input-brutal {
+    @apply w-full px-3 py-2 border-2 border-text bg-white font-medium 
+           focus:outline-none focus:ring-2 focus:ring-primary focus:border-text
+           placeholder:text-gray-400;
+  }
+  .badge-brutal {
+    @apply inline-flex items-center px-2 py-0.5 text-xs font-bold border-2 border-text shadow-brutal-sm;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FBFBF9;
+}
+::-webkit-scrollbar-thumb {
+  background: #1C293C;
+  border: 1px solid #1C293C;
+}
+
+/* Animation for queue display */
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 4px 4px 0px 0px #1C293C; }
+  50% { box-shadow: 4px 4px 0px 0px #FDC800; }
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
