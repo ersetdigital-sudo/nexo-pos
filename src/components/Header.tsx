@@ -1,6 +1,6 @@
 "use client";
 
-import { IconBell, IconWifi, IconDashboard } from "./Icons";
+import { IconBell, IconWifi } from "./Icons";
 
 export default function Header({ title, onMenuToggle }: { title: string; onMenuToggle?: () => void }) {
   return (

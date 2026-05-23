@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import { IconDashboard, IconCashier, IconCustomerDisplay, IconOrders, IconSettings } from "./Icons";
 
 export default function MainLayout({
   children,
@@ -44,16 +47,12 @@ export default function MainLayout({
 }
 
 function MobileBottomNav() {
-  const { usePathname } = require("next/navigation");
-  const { default: Link } = require("next/link");
-  const { IconDashboard, IconCashier, IconProducts, IconOrders, IconSettings } = require("./Icons");
-
   const pathname = usePathname();
 
   const items = [
     { href: "/", label: "Home", icon: IconDashboard },
     { href: "/cashier", label: "Kasir", icon: IconCashier },
-    { href: "/display", label: "Display", icon: IconProducts },
+    { href: "/display", label: "Display", icon: IconCustomerDisplay },
     { href: "/orders", label: "Riwayat", icon: IconOrders },
     { href: "/settings", label: "Lainnya", icon: IconSettings },
   ];
