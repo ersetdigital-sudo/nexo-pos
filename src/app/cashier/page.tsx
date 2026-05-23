@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useStore, Product, CartItem } from "@/store";
 import Link from "next/link";
 import { IconSearch, IconCart, IconPlus, IconMinus, IconTrash, IconX, IconChevronLeft, IconCash, IconQris, IconCard } from "@/components/Icons";
@@ -29,6 +29,38 @@ export default function CashierPage() {
     const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.barcode?.includes(searchQuery);
     return matchCategory && matchSearch;
   });
+
+  // Broadcast cart changes to Customer Display (realtime sync)
+  const channelRef = useRef<BroadcastChannel | null>(null);
+
+  useEffect(() => {
+    channelRef.current = new BroadcastChannel("nexo-pos-display");
+
+    // Send store info on connect
+    channelRef.current.postMessage({
+      type: "STORE_INFO",
+      storeName: "Nexo POS",
+      taxRate,
+    });
+
+    // Listen for data requests from customer display
+    channelRef.current.onmessage = (event) => {
+      if (event.data.type === "REQUEST_DATA") {
+        channelRef.current?.postMessage({ type: "CART_UPDATE", cart });
+      }
+    };
+
+    return () => { channelRef.current?.close(); };
+  }, []);
+
+  // Broadcast cart updates whenever cart changes
+  useEffect(() => {
+    if (channelRef.current) {
+      channelRef.current.postMessage({ type: "CART_UPDATE", cart });
+    }
+    // Also save to localStorage for cross-tab fallback
+    localStorage.setItem("nexo-display-cart", JSON.stringify(cart));
+  }, [cart]);
 
   const subtotal = cart.reduce((sum, item) => sum + item.subtotal, 0);
   const tax = Math.round(subtotal * taxRate);
@@ -69,6 +101,14 @@ export default function CashierPage() {
       const table = tables.find((t) => t.number === parseInt(selectedTable));
       if (table) updateTableStatus(table.id, "occupied", order.id);
     }
+
+    // Broadcast order to Customer Display
+    channelRef.current?.postMessage({
+      type: "ORDER_CREATED",
+      order: { orderNumber, total, status: "pending" },
+    });
+    localStorage.setItem("nexo-display-order", JSON.stringify({ orderNumber, total, status: "pending", timestamp: Date.now() }));
+
     clearCart(); setShowPayment(false); setShowMobileCart(false);
     setCashAmount(""); setSelectedTable(""); setCustomerPhone("");
     alert(`Pesanan #${orderNumber} berhasil dibuat!`);
