@@ -48,6 +48,7 @@ export default function ProductsPage() {
     setVariations(product.variations || []); setShowForm(true);
   };
 
+
   const addVariation = () => {
     setVariations([...variations, { id: `var-${Date.now()}`, name: "", options: [{ id: `opt-${Date.now()}`, label: "", priceAdjustment: 0 }] }]);
   };
@@ -63,134 +64,136 @@ export default function ProductsPage() {
   return (
     <MainLayout title="Manajemen Produk">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-3 mb-6">
-        <div className="relative flex-1 max-w-xs">
+      <div className="flex flex-wrap items-center gap-3 mb-4 md:mb-6">
+        <div className="relative flex-1 min-w-[200px] max-w-xs">
           <IconSearch className="w-4 h-4 text-text-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input type="text" placeholder="Cari produk..." className="input pl-10"
+          <input type="text" placeholder="Cari produk..." className="input pl-10 text-[16px] sm:text-sm"
             value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide w-full sm:w-auto order-last sm:order-none">
           {categories.map((cat) => (
             <button key={cat} onClick={() => setFilterCategory(cat)}
-              className={`px-3.5 py-1.5 text-sm font-medium rounded-lg transition-all ${
+              className={`px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all whitespace-nowrap min-h-[44px] ${
                 filterCategory === cat ? "bg-primary-200 text-primary-800 shadow-bento" : "bg-surface-100 text-text-secondary hover:bg-primary-50"
               }`}>{cat}</button>
           ))}
         </div>
-        <button onClick={() => setShowForm(true)} className="btn-primary ml-auto">
-          <IconPlus className="w-4 h-4" /> Tambah Produk
+        <button onClick={() => setShowForm(true)} className="btn-primary ml-auto min-h-[44px]">
+          <IconPlus className="w-4 h-4" /> <span className="hidden sm:inline">Tambah Produk</span><span className="sm:hidden">Tambah</span>
         </button>
       </div>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
         {filteredProducts.map((product) => (
-          <div key={product.id} className="bento-card-hover group">
+          <div key={product.id} className="bento-card-hover group !p-3 sm:!p-4">
             <div className="flex items-start justify-between mb-3">
-              <div className="w-12 h-12 rounded-xl bg-primary-50 border border-primary-100/40 flex items-center justify-center text-2xl">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary-50 border border-primary-100/40 flex items-center justify-center text-xl sm:text-2xl">
                 {product.image}
               </div>
-              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                 <button onClick={() => handleEdit(product)}
-                  className="p-2 rounded-lg hover:bg-primary-50 transition-colors">
+                  className="p-2 rounded-lg hover:bg-primary-50 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center">
                   <IconEdit className="w-4 h-4 text-text-muted" />
                 </button>
                 <button onClick={() => { if (confirm("Hapus produk ini?")) deleteProduct(product.id); }}
-                  className="p-2 rounded-lg hover:bg-red-50 transition-colors">
+                  className="p-2 rounded-lg hover:bg-red-50 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center">
                   <IconTrash className="w-4 h-4 text-red-400" />
                 </button>
               </div>
             </div>
-            <h3 className="font-semibold text-sm text-text mb-1">{product.name}</h3>
-            <div className="font-bold text-primary-600">Rp {product.price.toLocaleString("id-ID")}</div>
+            <h3 className="font-semibold text-xs sm:text-sm text-text mb-1 truncate">{product.name}</h3>
+            <div className="font-bold text-primary-600 text-sm">Rp {product.price.toLocaleString("id-ID")}</div>
             <div className="flex items-center justify-between mt-3">
-              <span className="badge-neutral">{product.category}</span>
+              <span className="badge-neutral text-xs">{product.category}</span>
               <span className="text-xs text-text-muted">Stok: {product.stock}</span>
             </div>
             {product.variations && product.variations.length > 0 && (
               <span className="badge-primary mt-2 text-[10px]">{product.variations.length} varian</span>
             )}
             {product.barcode && (
-              <p className="text-[11px] font-mono text-text-muted mt-1">BC: {product.barcode}</p>
+              <p className="text-[11px] font-mono text-text-muted mt-1 truncate">BC: {product.barcode}</p>
             )}
           </div>
         ))}
       </div>
 
+
       {/* Add/Edit Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bento-card-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4 animate-fade-in">
+          <div className="bento-card-lg w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl safe-bottom">
             <div className="flex justify-between items-center mb-5">
-              <h2 className="text-xl font-bold text-text">
+              <h2 className="text-lg sm:text-xl font-bold text-text">
                 {editingProduct ? "Edit Produk" : "Tambah Produk Baru"}
               </h2>
-              <button onClick={resetForm} className="p-2 rounded-lg hover:bg-primary-50">
+              <button onClick={resetForm} className="p-2 rounded-lg hover:bg-primary-50 min-h-[44px] min-w-[44px] flex items-center justify-center">
                 <IconX className="w-5 h-5 text-text-muted" />
               </button>
             </div>
             <div className="space-y-4">
               {/* Emoji Picker */}
               <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2">Icon Produk</label>
+                <label className="block text-xs sm:text-sm font-medium text-text-secondary mb-2">Icon Produk</label>
                 <div className="flex flex-wrap gap-2">
                   {emojiOptions.map((emoji) => (
                     <button key={emoji} onClick={() => setFormData({ ...formData, image: emoji })}
-                      className={`text-2xl p-1.5 rounded-lg border transition-all ${
+                      className={`text-xl sm:text-2xl p-1.5 rounded-lg border transition-all min-h-[44px] min-w-[44px] flex items-center justify-center ${
                         formData.image === emoji ? "border-primary-300 bg-primary-50 scale-110" : "border-transparent hover:bg-primary-50"
                       }`}>{emoji}</button>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-text-secondary mb-1.5">Nama Produk</label>
-                <input className="input" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Nama produk..." />
+                <label className="block text-xs sm:text-sm font-medium text-text-secondary mb-1.5">Nama Produk</label>
+                <input className="input text-[16px] sm:text-sm" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Nama produk..." />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1.5">Harga (Rp)</label>
-                  <input type="number" className="input" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} placeholder="25000" />
+                  <label className="block text-xs sm:text-sm font-medium text-text-secondary mb-1.5">Harga (Rp)</label>
+                  <input type="number" className="input text-[16px] sm:text-sm" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} placeholder="25000" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1.5">Stok</label>
-                  <input type="number" className="input" value={formData.stock} onChange={(e) => setFormData({ ...formData, stock: e.target.value })} />
+                  <label className="block text-xs sm:text-sm font-medium text-text-secondary mb-1.5">Stok</label>
+                  <input type="number" className="input text-[16px] sm:text-sm" value={formData.stock} onChange={(e) => setFormData({ ...formData, stock: e.target.value })} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1.5">Kategori</label>
-                  <select className="input" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })}>
+                  <label className="block text-xs sm:text-sm font-medium text-text-secondary mb-1.5">Kategori</label>
+                  <select className="input text-[16px] sm:text-sm" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })}>
                     {categories.filter((c) => c !== "Semua").map((c) => (<option key={c} value={c}>{c}</option>))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary mb-1.5">Barcode</label>
-                  <input className="input" value={formData.barcode} onChange={(e) => setFormData({ ...formData, barcode: e.target.value })} placeholder="Optional" />
+                  <label className="block text-xs sm:text-sm font-medium text-text-secondary mb-1.5">Barcode</label>
+                  <input className="input text-[16px] sm:text-sm" value={formData.barcode} onChange={(e) => setFormData({ ...formData, barcode: e.target.value })} placeholder="Optional" />
                 </div>
               </div>
+
               {/* Variations */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-text-secondary">Varian Produk</label>
-                  <button onClick={addVariation} className="text-xs font-medium text-primary-600 hover:text-primary-800">+ Tambah Varian</button>
+                  <label className="text-xs sm:text-sm font-medium text-text-secondary">Varian Produk</label>
+                  <button onClick={addVariation} className="text-xs font-medium text-primary-600 hover:text-primary-800 min-h-[44px] flex items-center">+ Tambah Varian</button>
                 </div>
                 {variations.map((variation, vIdx) => (
                   <div key={variation.id} className="p-3 rounded-xl bg-primary-50 border border-primary-100/60 mb-2">
-                    <input className="input mb-2 text-sm" placeholder="Nama varian (cth: Level Pedas)" value={variation.name}
+                    <input className="input text-[16px] sm:text-sm mb-2" placeholder="Nama varian (cth: Level Pedas)" value={variation.name}
                       onChange={(e) => { const u = [...variations]; u[vIdx].name = e.target.value; setVariations(u); }} />
                     {variation.options.map((opt, oIdx) => (
                       <div key={opt.id} className="flex gap-2 mb-1.5">
-                        <input className="input text-sm flex-1" placeholder="Opsi" value={opt.label}
+                        <input className="input text-[16px] sm:text-sm flex-1" placeholder="Opsi" value={opt.label}
                           onChange={(e) => { const u = [...variations]; u[vIdx].options[oIdx].label = e.target.value; setVariations(u); }} />
-                        <input type="number" className="input text-sm w-24" placeholder="+Harga" value={opt.priceAdjustment}
+                        <input type="number" className="input text-[16px] sm:text-sm w-24" placeholder="+Harga" value={opt.priceAdjustment}
                           onChange={(e) => { const u = [...variations]; u[vIdx].options[oIdx].priceAdjustment = parseInt(e.target.value) || 0; setVariations(u); }} />
                       </div>
                     ))}
-                    <button onClick={() => addOption(vIdx)} className="text-xs font-medium text-primary-600 hover:underline mt-1">+ Opsi</button>
+                    <button onClick={() => addOption(vIdx)} className="text-xs font-medium text-primary-600 hover:underline mt-1 min-h-[44px] flex items-center">+ Opsi</button>
                   </div>
                 ))}
               </div>
-              <button onClick={handleSubmit} className="btn-success w-full py-3">
+              <button onClick={handleSubmit} className="btn-success w-full py-3 min-h-[44px]">
                 {editingProduct ? "Simpan Perubahan" : "Tambah Produk"}
               </button>
             </div>
