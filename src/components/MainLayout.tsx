@@ -53,7 +53,7 @@ function MobileBottomNav() {
   const items = [
     { href: "/", label: "Home", icon: IconDashboard },
     { href: "/cashier", label: "Kasir", icon: IconCashier },
-    { href: "/products", label: "Produk", icon: IconProducts },
+    { href: "/display", label: "Display", icon: IconProducts },
     { href: "/orders", label: "Riwayat", icon: IconOrders },
     { href: "/settings", label: "Lainnya", icon: IconSettings },
   ];

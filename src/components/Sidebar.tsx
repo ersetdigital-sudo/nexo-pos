@@ -11,9 +11,7 @@ import {
 const menuItems = [
   { href: "/", label: "Dashboard", icon: IconDashboard },
   { href: "/cashier", label: "Kasir", icon: IconCashier },
-  { href: "/customer-display", label: "Customer Display", icon: IconCustomerDisplay },
-  { href: "/queue", label: "Antrian", icon: IconQueue },
-  { href: "/kitchen", label: "Dapur", icon: IconKitchen },
+  { href: "/display", label: "Display", icon: IconCustomerDisplay },
   { href: "/products", label: "Produk", icon: IconProducts },
   { href: "/tables", label: "Meja & QR", icon: IconTable },
   { href: "/self-order", label: "Self Order", icon: IconSelfOrder },
