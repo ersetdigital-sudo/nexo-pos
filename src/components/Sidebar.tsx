@@ -23,13 +23,13 @@ const menuItems = [
   { href: "/settings", label: "Pengaturan", icon: IconSettings },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
 
   return (
     <aside className="w-[250px] min-h-screen bg-white border-r border-primary-100/80 flex flex-col">
       {/* Logo */}
-      <div className="p-6 pb-4">
+      <div className="p-5 pb-4">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 bg-primary-200 rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-primary-800" viewBox="0 0 24 24" fill="currentColor">
@@ -52,13 +52,14 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+              onClick={onNavigate}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 min-h-[44px] ${
                 isActive
                   ? "bg-primary-100/80 text-primary-800"
                   : "text-text-secondary hover:bg-surface-200 hover:text-text"
               }`}
             >
-              <Icon className={`w-[18px] h-[18px] ${isActive ? "text-primary-600" : "text-text-muted"}`} />
+              <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${isActive ? "text-primary-600" : "text-text-muted"}`} />
               <span>{item.label}</span>
             </Link>
           );
