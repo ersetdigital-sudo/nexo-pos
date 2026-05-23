@@ -2,6 +2,7 @@
 
 import MainLayout from "@/components/MainLayout";
 import { useStore } from "@/store";
+import { IconClock, IconCheck, IconFire } from "@/components/Icons";
 
 export default function QueuePage() {
   const { orders, updateOrderStatus } = useStore();
@@ -10,128 +11,101 @@ export default function QueuePage() {
   const readyOrders = orders.filter((o) => o.status === "ready");
   const pendingOrders = orders.filter((o) => o.status === "pending");
 
+  const Column = ({ title, count, color, children }: { title: string; count: number; color: string; children: React.ReactNode }) => (
+    <div>
+      <div className="flex items-center gap-3 mb-4">
+        <div className={`w-3 h-3 rounded-full ${color}`} />
+        <h2 className="text-lg font-bold text-dark-800">{title}</h2>
+        <span className="badge-neutral">{count}</span>
+      </div>
+      <div className="space-y-3">{children}</div>
+    </div>
+  );
+
   return (
-    <MainLayout title="📋 Antrian Pesanan">
+    <MainLayout title="Antrian Pesanan">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Pending */}
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-4 h-4 bg-gray-400 border-2 border-text"></div>
-            <h2 className="text-xl font-black">Menunggu ({pendingOrders.length})</h2>
-          </div>
-          <div className="space-y-3">
-            {pendingOrders.map((order) => (
-              <div key={order.id} className="card-brutal animate-slide-in">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-2xl font-black">#{order.orderNumber}</span>
-                  <span className="badge-brutal bg-gray-200">Baru</span>
-                </div>
-                <div className="text-sm space-y-1 mb-3">
-                  {order.items.map((item, i) => (
-                    <div key={i} className="flex justify-between">
-                      <span>{item.product.name} x{item.quantity}</span>
-                    </div>
-                  ))}
-                </div>
-                {order.tableNumber && (
-                  <div className="text-sm font-bold text-secondary mb-2">Meja {order.tableNumber}</div>
-                )}
-                <button
-                  onClick={() => updateOrderStatus(order.id, "preparing")}
-                  className="btn-brutal-primary w-full text-sm py-2"
-                >
-                  🍳 Mulai Proses
-                </button>
+        <Column title="Menunggu" count={pendingOrders.length} color="bg-dark-300">
+          {pendingOrders.map((order) => (
+            <div key={order.id} className="card animate-slide-up">
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-2xl font-bold text-dark-800">#{order.orderNumber}</span>
+                <span className="badge-neutral">Baru</span>
               </div>
-            ))}
-            {pendingOrders.length === 0 && (
-              <div className="text-center py-8 text-gray-400">
-                <div className="text-4xl mb-2">✅</div>
-                <p className="font-medium">Tidak ada pesanan baru</p>
+              <div className="text-sm space-y-1.5 mb-3 text-dark-600">
+                {order.items.map((item, i) => (
+                  <div key={i} className="flex justify-between">
+                    <span>{item.product.name}</span><span className="font-medium">x{item.quantity}</span>
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
-        </div>
+              {order.tableNumber && <p className="text-sm font-medium text-primary-600 mb-3">Meja {order.tableNumber}</p>}
+              <button onClick={() => updateOrderStatus(order.id, "preparing")} className="btn-accent w-full text-sm py-2.5">
+                <IconFire className="w-4 h-4" /> Mulai Proses
+              </button>
+            </div>
+          ))}
+          {pendingOrders.length === 0 && (
+            <div className="text-center py-10 text-dark-300">
+              <IconCheck className="w-10 h-10 mx-auto mb-2" />
+              <p className="font-medium">Tidak ada pesanan baru</p>
+            </div>
+          )}
+        </Column>
 
-        {/* Preparing */}
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-4 h-4 bg-warning border-2 border-text"></div>
-            <h2 className="text-xl font-black">Diproses ({preparingOrders.length})</h2>
-          </div>
-          <div className="space-y-3">
-            {preparingOrders.map((order) => (
-              <div key={order.id} className="card-brutal border-warning animate-pulse-glow">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-2xl font-black">#{order.orderNumber}</span>
-                  <span className="badge-brutal bg-warning text-white">Proses</span>
-                </div>
-                <div className="text-sm space-y-1 mb-3">
-                  {order.items.map((item, i) => (
-                    <div key={i} className="flex justify-between">
-                      <span>{item.product.name} x{item.quantity}</span>
-                    </div>
-                  ))}
-                </div>
-                {order.tableNumber && (
-                  <div className="text-sm font-bold text-secondary mb-2">Meja {order.tableNumber}</div>
-                )}
-                <button
-                  onClick={() => updateOrderStatus(order.id, "ready")}
-                  className="btn-brutal-success w-full text-sm py-2"
-                >
-                  ✅ Siap Diambil
-                </button>
+        <Column title="Diproses" count={preparingOrders.length} color="bg-amber-500">
+          {preparingOrders.map((order) => (
+            <div key={order.id} className="card border-amber-200 bg-amber-50/50 animate-pulse-soft">
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-2xl font-bold text-dark-800">#{order.orderNumber}</span>
+                <span className="badge-warning">Proses</span>
               </div>
-            ))}
-            {preparingOrders.length === 0 && (
-              <div className="text-center py-8 text-gray-400">
-                <div className="text-4xl mb-2">🍳</div>
-                <p className="font-medium">Tidak ada yang diproses</p>
+              <div className="text-sm space-y-1.5 mb-3 text-dark-600">
+                {order.items.map((item, i) => (
+                  <div key={i} className="flex justify-between">
+                    <span>{item.product.name}</span><span className="font-medium">x{item.quantity}</span>
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
-        </div>
+              {order.tableNumber && <p className="text-sm font-medium text-primary-600 mb-3">Meja {order.tableNumber}</p>}
+              <button onClick={() => updateOrderStatus(order.id, "ready")} className="btn-success w-full text-sm py-2.5">
+                <IconCheck className="w-4 h-4" /> Siap Diambil
+              </button>
+            </div>
+          ))}
+          {preparingOrders.length === 0 && (
+            <div className="text-center py-10 text-dark-300">
+              <IconClock className="w-10 h-10 mx-auto mb-2" />
+              <p className="font-medium">Tidak ada yang diproses</p>
+            </div>
+          )}
+        </Column>
 
-        {/* Ready */}
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-4 h-4 bg-success border-2 border-text"></div>
-            <h2 className="text-xl font-black">Siap ({readyOrders.length})</h2>
-          </div>
-          <div className="space-y-3">
-            {readyOrders.map((order) => (
-              <div key={order.id} className="card-brutal border-success bg-green-50">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-2xl font-black">#{order.orderNumber}</span>
-                  <span className="badge-brutal bg-success text-white">Siap</span>
-                </div>
-                <div className="text-sm space-y-1 mb-3">
-                  {order.items.map((item, i) => (
-                    <div key={i}>
-                      {item.product.name} x{item.quantity}
-                    </div>
-                  ))}
-                </div>
-                {order.tableNumber && (
-                  <div className="text-sm font-bold text-secondary mb-2">Meja {order.tableNumber}</div>
-                )}
-                <button
-                  onClick={() => updateOrderStatus(order.id, "completed")}
-                  className="btn-brutal-secondary w-full text-sm py-2"
-                >
-                  🎉 Selesai
-                </button>
+        <Column title="Siap" count={readyOrders.length} color="bg-emerald-500">
+          {readyOrders.map((order) => (
+            <div key={order.id} className="card border-emerald-200 bg-emerald-50/50">
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-2xl font-bold text-dark-800">#{order.orderNumber}</span>
+                <span className="badge-success">Siap</span>
               </div>
-            ))}
-            {readyOrders.length === 0 && (
-              <div className="text-center py-8 text-gray-400">
-                <div className="text-4xl mb-2">📭</div>
-                <p className="font-medium">Belum ada yang siap</p>
+              <div className="text-sm space-y-1.5 mb-3 text-dark-600">
+                {order.items.map((item, i) => (
+                  <div key={i}>{item.product.name} x{item.quantity}</div>
+                ))}
               </div>
-            )}
-          </div>
-        </div>
+              {order.tableNumber && <p className="text-sm font-medium text-primary-600 mb-3">Meja {order.tableNumber}</p>}
+              <button onClick={() => updateOrderStatus(order.id, "completed")} className="btn-primary w-full text-sm py-2.5">
+                <IconCheck className="w-4 h-4" /> Selesai
+              </button>
+            </div>
+          ))}
+          {readyOrders.length === 0 && (
+            <div className="text-center py-10 text-dark-300">
+              <IconCheck className="w-10 h-10 mx-auto mb-2" />
+              <p className="font-medium">Belum ada yang siap</p>
+            </div>
+          )}
+        </Column>
       </div>
     </MainLayout>
   );

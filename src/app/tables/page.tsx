@@ -3,6 +3,7 @@
 import { useState } from "react";
 import MainLayout from "@/components/MainLayout";
 import { useStore } from "@/store";
+import { IconQris, IconPrinter, IconTable } from "@/components/Icons";
 
 export default function TablesPage() {
   const { tables, updateTableStatus, orders } = useStore();
@@ -14,51 +15,35 @@ export default function TablesPage() {
     return orders.find((o) => o.id === table.currentOrderId);
   };
 
+  const selected = tables.find((t) => t.id === selectedTable);
+
   return (
-    <MainLayout title="🪑 Meja & QR Code">
+    <MainLayout title="Meja & QR Code">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Table Grid */}
         <div className="lg:col-span-2">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-success border-2 border-text"></div>
-              <span className="text-sm font-medium">Tersedia</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-danger border-2 border-text"></div>
-              <span className="text-sm font-medium">Terpakai</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-warning border-2 border-text"></div>
-              <span className="text-sm font-medium">Reservasi</span>
-            </div>
+          <div className="flex items-center gap-5 mb-5">
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-emerald-500" /><span className="text-sm text-dark-500">Tersedia</span></div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-red-500" /><span className="text-sm text-dark-500">Terpakai</span></div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-amber-500" /><span className="text-sm text-dark-500">Reservasi</span></div>
           </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {tables.map((table) => (
-              <button
-                key={table.id}
-                onClick={() => setSelectedTable(table.id)}
-                className={`card-brutal text-center transition-all hover:-translate-y-1 ${
-                  table.status === "available"
-                    ? "bg-green-50 border-success"
-                    : table.status === "occupied"
-                    ? "bg-red-50 border-danger"
-                    : "bg-yellow-50 border-warning"
-                } ${selectedTable === table.id ? "shadow-brutal-lg -translate-x-1 -translate-y-1" : ""}`}
-              >
-                <div className="text-3xl mb-1">🪑</div>
-                <div className="text-2xl font-black">{table.number}</div>
-                <div className="text-xs font-medium text-gray-500">{table.seats} kursi</div>
-                <div
-                  className={`mt-2 text-xs font-bold ${
-                    table.status === "available"
-                      ? "text-success"
-                      : table.status === "occupied"
-                      ? "text-danger"
-                      : "text-warning"
-                  }`}
-                >
+              <button key={table.id} onClick={() => setSelectedTable(table.id)}
+                className={`card text-center transition-all hover:-translate-y-1 ${
+                  table.status === "available" ? "border-emerald-200 bg-emerald-50/50" :
+                  table.status === "occupied" ? "border-red-200 bg-red-50/50" : "border-amber-200 bg-amber-50/50"
+                } ${selectedTable === table.id ? "ring-2 ring-primary-400 shadow-elevated" : ""}`}>
+                <IconTable className={`w-6 h-6 mx-auto mb-1 ${
+                  table.status === "available" ? "text-emerald-500" :
+                  table.status === "occupied" ? "text-red-500" : "text-amber-500"
+                }`} />
+                <div className="text-2xl font-bold text-dark-800">{table.number}</div>
+                <div className="text-xs text-dark-400">{table.seats} kursi</div>
+                <div className={`text-xs font-medium mt-1 ${
+                  table.status === "available" ? "text-emerald-600" :
+                  table.status === "occupied" ? "text-red-600" : "text-amber-600"
+                }`}>
                   {table.status === "available" ? "Kosong" : table.status === "occupied" ? "Terpakai" : "Reservasi"}
                 </div>
               </button>
@@ -66,82 +51,57 @@ export default function TablesPage() {
           </div>
         </div>
 
-        {/* Table Detail / QR */}
+        {/* Detail */}
         <div className="space-y-4">
-          {selectedTable ? (
+          {selected ? (
             <>
-              <div className="card-brutal">
-                <h3 className="font-black text-lg mb-3">
-                  Meja {tables.find((t) => t.id === selectedTable)?.number}
-                </h3>
+              <div className="card">
+                <h3 className="font-bold text-dark-800 mb-3">Meja {selected.number}</h3>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Kapasitas</span>
-                    <span className="font-bold">{tables.find((t) => t.id === selectedTable)?.seats} kursi</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Status</span>
-                    <span className="font-bold capitalize">{tables.find((t) => t.id === selectedTable)?.status}</span>
-                  </div>
+                  <div className="flex justify-between"><span className="text-dark-400">Kapasitas</span><span className="font-medium">{selected.seats} kursi</span></div>
+                  <div className="flex justify-between"><span className="text-dark-400">Status</span><span className="font-medium capitalize">{selected.status}</span></div>
                 </div>
-
                 <div className="mt-4 space-y-2">
-                  <button
-                    onClick={() => updateTableStatus(selectedTable, "available")}
-                    className="btn-brutal-success w-full text-sm py-2"
-                  >
-                    Tandai Kosong
-                  </button>
-                  <button
-                    onClick={() => updateTableStatus(selectedTable, "reserved")}
-                    className="btn-brutal-primary w-full text-sm py-2"
-                  >
-                    Reservasi
-                  </button>
+                  <button onClick={() => updateTableStatus(selectedTable!, "available")} className="btn-success w-full text-sm py-2.5">Tandai Kosong</button>
+                  <button onClick={() => updateTableStatus(selectedTable!, "reserved")} className="btn-outline w-full text-sm py-2.5">Reservasi</button>
                 </div>
               </div>
-
-              {/* QR Code */}
-              <div className="card-brutal text-center">
-                <h3 className="font-black mb-3">📱 QR Code Meja</h3>
-                <div className="w-48 h-48 mx-auto bg-white border-4 border-text flex items-center justify-center mb-3">
+              <div className="card text-center">
+                <h3 className="font-bold text-dark-800 mb-3 flex items-center justify-center gap-2">
+                  <IconQris className="w-4 h-4 text-primary-500" /> QR Code Meja
+                </h3>
+                <div className="w-44 h-44 mx-auto bg-dark-50 rounded-2xl border border-dark-100 flex items-center justify-center mb-3">
                   <div className="text-center">
-                    <div className="text-5xl mb-2">🔲</div>
-                    <p className="text-xs font-bold">MEJA {tables.find((t) => t.id === selectedTable)?.number}</p>
-                    <p className="text-xs text-gray-400">Scan untuk order</p>
+                    <IconQris className="w-14 h-14 text-dark-300 mx-auto mb-2" />
+                    <p className="text-xs font-semibold text-dark-500">MEJA {selected.number}</p>
                   </div>
                 </div>
-                <button className="btn-brutal-secondary w-full text-sm py-2">
-                  🖨️ Cetak QR Code
+                <button className="btn-primary w-full text-sm py-2.5">
+                  <IconPrinter className="w-4 h-4" /> Cetak QR Code
                 </button>
-                <p className="text-xs text-gray-400 mt-2">
-                  Pelanggan scan untuk self-order
-                </p>
+                <p className="text-xs text-dark-400 mt-2">Pelanggan scan untuk self-order</p>
               </div>
-
-              {/* Active Order */}
-              {getTableOrder(selectedTable) && (
-                <div className="card-brutal border-secondary">
-                  <h3 className="font-bold text-sm mb-2">Pesanan Aktif</h3>
-                  <div className="text-sm space-y-1">
-                    {getTableOrder(selectedTable)?.items.map((item, i) => (
-                      <div key={i} className="flex justify-between">
-                        <span>{item.product.name}</span>
-                        <span className="font-bold">x{item.quantity}</span>
+              {getTableOrder(selectedTable!) && (
+                <div className="card border-primary-200">
+                  <h3 className="font-semibold text-sm text-dark-800 mb-2">Pesanan Aktif</h3>
+                  <div className="text-sm space-y-1.5">
+                    {getTableOrder(selectedTable!)?.items.map((item, i) => (
+                      <div key={i} className="flex justify-between text-dark-600">
+                        <span>{item.product.name}</span><span className="font-medium">x{item.quantity}</span>
                       </div>
                     ))}
-                    <div className="border-t border-gray-200 pt-2 mt-2 font-black">
-                      Total: Rp {getTableOrder(selectedTable)?.total.toLocaleString("id-ID")}
+                    <div className="pt-2 border-t border-dark-100 font-bold text-dark-800">
+                      Total: Rp {getTableOrder(selectedTable!)?.total.toLocaleString("id-ID")}
                     </div>
                   </div>
                 </div>
               )}
             </>
           ) : (
-            <div className="card-brutal text-center py-12">
-              <div className="text-5xl mb-3">👆</div>
-              <p className="font-bold">Pilih Meja</p>
-              <p className="text-sm text-gray-500 mt-1">Klik meja untuk melihat detail & QR code</p>
+            <div className="card text-center py-16">
+              <IconTable className="w-12 h-12 mx-auto text-dark-200 mb-3" />
+              <p className="font-medium text-dark-400">Pilih Meja</p>
+              <p className="text-sm text-dark-300 mt-1">Klik meja untuk detail & QR code</p>
             </div>
           )}
         </div>

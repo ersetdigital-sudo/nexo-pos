@@ -1,6 +1,7 @@
 "use client";
 
 import { useStore } from "@/store";
+import { IconClock, IconCheck, IconFire } from "@/components/Icons";
 
 export default function KitchenPage() {
   const { orders, updateOrderStatus } = useStore();
@@ -10,101 +11,84 @@ export default function KitchenPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
+    <div className="min-h-screen bg-dark-950 p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-black text-primary">🍳 KITCHEN DISPLAY</h1>
-          <div className="badge-brutal bg-success text-white border-white">
-            {kitchenOrders.length} aktif
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+            <IconFire className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-white">Kitchen Display</h1>
+            <p className="text-sm text-dark-400">{kitchenOrders.length} pesanan aktif</p>
           </div>
         </div>
-        <div className="text-lg font-mono">
+        <div className="text-2xl font-mono font-bold text-dark-300">
           {new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
         </div>
       </div>
 
       {kitchenOrders.length === 0 ? (
-        <div className="text-center py-24">
-          <div className="text-8xl mb-4">👨‍🍳</div>
-          <p className="text-3xl font-bold text-gray-400">Belum Ada Pesanan</p>
-          <p className="text-lg text-gray-500 mt-2">Menunggu pesanan masuk...</p>
+        <div className="text-center py-32">
+          <div className="w-24 h-24 mx-auto mb-4 rounded-3xl bg-white/5 flex items-center justify-center">
+            <IconCheck className="w-12 h-12 text-emerald-500" />
+          </div>
+          <p className="text-2xl font-bold text-dark-300">Semua Selesai!</p>
+          <p className="text-dark-500 mt-2">Menunggu pesanan baru masuk...</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {kitchenOrders.map((order) => (
-            <div
-              key={order.id}
-              className={`border-4 p-4 ${
+            <div key={order.id}
+              className={`rounded-2xl p-5 border transition-all animate-fade-in ${
                 order.status === "preparing"
-                  ? "border-warning bg-warning/10"
-                  : "border-white bg-white/5"
-              }`}
-            >
-              {/* Order Header */}
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-3xl font-black">#{order.orderNumber}</span>
-                <span
-                  className={`px-2 py-1 text-xs font-black border-2 ${
-                    order.status === "preparing"
-                      ? "bg-warning text-white border-warning"
-                      : "bg-white text-gray-900 border-white"
-                  }`}
-                >
-                  {order.status === "preparing" ? "PROSES" : "BARU"}
+                  ? "bg-amber-500/10 border-amber-500/30"
+                  : "bg-white/5 border-white/10"
+              }`}>
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-3xl font-bold text-white">#{order.orderNumber}</span>
+                <span className={`badge ${order.status === "preparing" ? "badge-warning" : "badge-neutral"}`}>
+                  {order.status === "preparing" ? "Proses" : "Baru"}
                 </span>
               </div>
 
-              {/* Table / Customer */}
               {order.tableNumber && (
-                <div className="text-primary font-black mb-2">MEJA {order.tableNumber}</div>
+                <div className="text-sm font-semibold text-primary-400 mb-3">Meja {order.tableNumber}</div>
               )}
 
-              {/* Items */}
-              <div className="space-y-2 mb-4">
+              <div className="space-y-2 mb-5">
                 {order.items.map((item, i) => (
-                  <div key={i} className="border-b border-white/20 pb-2">
-                    <div className="flex justify-between">
-                      <span className="font-bold text-lg">
-                        {item.product.image} {item.product.name}
-                      </span>
-                      <span className="text-2xl font-black text-primary">x{item.quantity}</span>
+                  <div key={i} className="p-3 rounded-xl bg-white/5">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium text-white">{item.product.name}</span>
+                      <span className="text-xl font-bold text-primary-400">x{item.quantity}</span>
                     </div>
                     {item.selectedVariations && item.selectedVariations.length > 0 && (
-                      <div className="text-sm text-yellow-300 mt-1">
-                        → {item.selectedVariations.map((v) => {
+                      <p className="text-xs text-amber-300 mt-1">
+                        {item.selectedVariations.map((v) => {
                           const variation = item.product.variations?.find((pv) => pv.id === v.variationId);
-                          const option = variation?.options.find((o) => o.id === v.optionId);
-                          return option?.label;
+                          return variation?.options.find((o) => o.id === v.optionId)?.label;
                         }).join(", ")}
-                      </div>
-                    )}
-                    {item.notes && (
-                      <div className="text-sm text-red-300 mt-1">📝 {item.notes}</div>
+                      </p>
                     )}
                   </div>
                 ))}
               </div>
 
-              {/* Time */}
-              <div className="text-xs text-gray-400 mb-3">
-                Masuk: {new Date(order.createdAt).toLocaleTimeString("id-ID")}
+              <div className="flex items-center gap-2 text-xs text-dark-400 mb-4">
+                <IconClock className="w-3.5 h-3.5" />
+                {new Date(order.createdAt).toLocaleTimeString("id-ID")}
               </div>
 
-              {/* Action */}
               {order.status === "pending" ? (
-                <button
-                  onClick={() => updateOrderStatus(order.id, "preparing")}
-                  className="w-full py-3 bg-warning text-white border-2 border-white font-black text-lg hover:bg-yellow-500 transition-colors"
-                >
-                  🍳 MULAI MASAK
+                <button onClick={() => updateOrderStatus(order.id, "preparing")}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold text-sm hover:opacity-90 transition-opacity">
+                  Mulai Masak
                 </button>
               ) : (
-                <button
-                  onClick={() => updateOrderStatus(order.id, "ready")}
-                  className="w-full py-3 bg-success text-white border-2 border-white font-black text-lg hover:bg-green-500 transition-colors"
-                >
-                  ✅ SELESAI
+                <button onClick={() => updateOrderStatus(order.id, "ready")}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold text-sm hover:opacity-90 transition-opacity">
+                  Selesai
                 </button>
               )}
             </div>
