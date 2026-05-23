@@ -25,17 +25,23 @@ export default function OrdersPage() {
     <MainLayout title="Riwayat Pesanan">
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="card p-5">
-          <div className="flex items-center gap-2 mb-2"><IconOrders className="w-4 h-4 text-primary-500" /><span className="text-sm text-dark-400">Total Pesanan</span></div>
-          <div className="text-3xl font-bold text-dark-800">{orders.length}</div>
+        <div className="bento-card p-5">
+          <div className="flex items-center gap-2 mb-2">
+            <IconOrders className="w-4 h-4 text-primary-500" />
+            <span className="text-sm text-text-muted">Total Pesanan</span>
+          </div>
+          <div className="text-3xl font-bold text-text">{orders.length}</div>
         </div>
-        <div className="card bg-gradient-to-br from-primary-500 to-primary-700 text-white border-0 p-5">
-          <div className="flex items-center gap-2 mb-2"><IconTrendUp className="w-4 h-4 opacity-80" /><span className="text-sm opacity-80">Total Pendapatan</span></div>
-          <div className="text-2xl font-bold">Rp {totalRevenue.toLocaleString("id-ID")}</div>
+        <div className="bento-card-accent p-5">
+          <div className="flex items-center gap-2 mb-2">
+            <IconTrendUp className="w-4 h-4 text-primary-700" />
+            <span className="text-sm text-primary-700">Total Pendapatan</span>
+          </div>
+          <div className="text-2xl font-bold text-primary-800">Rp {totalRevenue.toLocaleString("id-ID")}</div>
         </div>
-        <div className="card p-5">
-          <span className="text-sm text-dark-400">Rata-rata / Order</span>
-          <div className="text-2xl font-bold text-dark-800 mt-1">
+        <div className="bento-card p-5">
+          <span className="text-sm text-text-muted">Rata-rata / Order</span>
+          <div className="text-2xl font-bold text-text mt-1">
             Rp {orders.length > 0 ? Math.round(totalRevenue / Math.max(orders.filter(o => o.status === "completed").length, 1)).toLocaleString("id-ID") : "0"}
           </div>
         </div>
@@ -46,7 +52,7 @@ export default function OrdersPage() {
         {statuses.map((s) => (
           <button key={s.value} onClick={() => setFilterStatus(s.value)}
             className={`px-3.5 py-1.5 text-sm font-medium rounded-lg transition-all ${
-              filterStatus === s.value ? "bg-primary-600 text-white shadow-soft" : "bg-dark-100 text-dark-600 hover:bg-dark-200"
+              filterStatus === s.value ? "bg-primary-200 text-primary-800 shadow-bento" : "bg-surface-100 text-text-secondary hover:bg-primary-50"
             }`}>{s.label}</button>
         ))}
       </div>
@@ -55,22 +61,22 @@ export default function OrdersPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div className="lg:col-span-2 space-y-2">
           {filteredOrders.length === 0 ? (
-            <div className="card text-center py-16">
-              <IconOrders className="w-12 h-12 mx-auto text-dark-200 mb-3" />
-              <p className="font-medium text-dark-400">Belum ada pesanan</p>
+            <div className="bento-card text-center py-16">
+              <IconOrders className="w-12 h-12 mx-auto text-text-muted mb-3" />
+              <p className="font-medium text-text-secondary">Belum ada pesanan</p>
             </div>
           ) : (
             filteredOrders.map((order) => (
               <button key={order.id} onClick={() => setSelectedOrder(order.id)}
-                className={`card w-full text-left transition-all hover:shadow-elevated ${selectedOrder === order.id ? "ring-2 ring-primary-400" : ""}`}>
+                className={`bento-card w-full text-left transition-all hover:shadow-bento-md ${selectedOrder === order.id ? "ring-2 ring-primary-300" : ""}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-dark-50 flex items-center justify-center text-sm font-bold text-primary-600">
+                    <div className="w-10 h-10 rounded-xl bg-primary-50 border border-primary-100/40 flex items-center justify-center text-sm font-bold text-primary-600">
                       #{order.orderNumber.slice(-3)}
                     </div>
                     <div>
-                      <span className="font-semibold text-sm text-dark-800">Order #{order.orderNumber}</span>
-                      <span className="text-xs text-dark-400 ml-2">{order.items.length} item</span>
+                      <span className="font-semibold text-sm text-text">Order #{order.orderNumber}</span>
+                      <span className="text-xs text-text-muted ml-2">{order.items.length} item</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -81,7 +87,7 @@ export default function OrdersPage() {
                     }`}>{order.status}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 mt-2 text-xs text-dark-400">
+                <div className="flex items-center gap-4 mt-2 text-xs text-text-muted">
                   <span>{order.paymentMethod.toUpperCase()}</span>
                   {order.tableNumber && <span>Meja {order.tableNumber}</span>}
                   <span>{new Date(order.createdAt).toLocaleString("id-ID")}</span>
@@ -94,23 +100,23 @@ export default function OrdersPage() {
         {/* Detail */}
         <div>
           {selectedOrderData ? (
-            <div className="card sticky top-24">
-              <h3 className="font-bold text-dark-800 mb-4">Detail #{selectedOrderData.orderNumber}</h3>
+            <div className="bento-card sticky top-24">
+              <h3 className="font-bold text-text mb-4">Detail #{selectedOrderData.orderNumber}</h3>
               <div className="space-y-2 mb-4">
                 {selectedOrderData.items.map((item, i) => (
                   <div key={i} className="flex justify-between text-sm">
-                    <span className="text-dark-600">{item.product.image} {item.product.name} x{item.quantity}</span>
+                    <span className="text-text-secondary">{item.product.image} {item.product.name} x{item.quantity}</span>
                     <span className="font-medium">Rp {item.subtotal.toLocaleString("id-ID")}</span>
                   </div>
                 ))}
               </div>
-              <div className="pt-3 border-t border-dark-100 mb-4">
+              <div className="pt-3 border-t border-primary-100/60 mb-4">
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
                   <span className="text-primary-600">Rp {selectedOrderData.total.toLocaleString("id-ID")}</span>
                 </div>
               </div>
-              <div className="text-sm space-y-1.5 text-dark-500 mb-4">
+              <div className="text-sm space-y-1.5 text-text-secondary mb-4">
                 <p>{selectedOrderData.paymentMethod.toUpperCase()}</p>
                 {selectedOrderData.tableNumber && <p>Meja {selectedOrderData.tableNumber}</p>}
                 {selectedOrderData.customerName && <p>{selectedOrderData.customerName}</p>}
@@ -122,9 +128,9 @@ export default function OrdersPage() {
               </div>
             </div>
           ) : (
-            <div className="card text-center py-16">
-              <IconOrders className="w-10 h-10 mx-auto text-dark-200 mb-3" />
-              <p className="font-medium text-dark-400">Pilih pesanan</p>
+            <div className="bento-card text-center py-16">
+              <IconOrders className="w-10 h-10 mx-auto text-text-muted mb-3" />
+              <p className="font-medium text-text-secondary">Pilih pesanan</p>
             </div>
           )}
         </div>
