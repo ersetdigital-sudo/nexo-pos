@@ -6,70 +6,76 @@
 
 @layer base {
   body {
-    @apply bg-dark-50 text-dark-900 font-sans antialiased;
+    @apply bg-surface-200 text-text font-sans antialiased;
   }
 }
 
 @layer components {
+  /* Bento Cards */
+  .bento-card {
+    @apply bg-white rounded-xl border border-primary-100/60 shadow-bento p-4 transition-all duration-200;
+  }
+  .bento-card-hover {
+    @apply bento-card hover:shadow-bento-md hover:-translate-y-0.5;
+  }
+  .bento-card-lg {
+    @apply bg-white rounded-2xl border border-primary-100/60 shadow-bento-md p-6;
+  }
+  .bento-card-accent {
+    @apply rounded-xl border border-primary-200 bg-primary-50 shadow-bento p-4;
+  }
+
   /* Buttons */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold
-           rounded-xl transition-all duration-200 cursor-pointer select-none
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium
+           rounded-lg transition-all duration-200 cursor-pointer select-none
            focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.97];
   }
   .btn-primary {
-    @apply btn bg-gradient-primary text-white shadow-soft hover:shadow-glow
-           focus:ring-primary-400;
+    @apply btn bg-primary-200 text-primary-800 hover:bg-primary-300 
+           focus:ring-primary-300 shadow-bento;
   }
-  .btn-accent {
-    @apply btn bg-gradient-accent text-white shadow-soft hover:shadow-glow-accent
-           focus:ring-accent-400;
+  .btn-secondary {
+    @apply btn bg-secondary-300 text-white hover:bg-secondary-400
+           focus:ring-secondary-300 shadow-bento;
   }
   .btn-success {
-    @apply btn bg-gradient-success text-white shadow-soft hover:opacity-90
-           focus:ring-emerald-400;
+    @apply btn bg-success text-white hover:bg-green-700
+           focus:ring-green-400 shadow-bento;
   }
   .btn-danger {
-    @apply btn bg-red-500 text-white shadow-soft hover:bg-red-600
-           focus:ring-red-400;
+    @apply btn bg-danger text-white hover:bg-red-700
+           focus:ring-red-400 shadow-bento;
   }
   .btn-ghost {
-    @apply btn bg-transparent text-dark-600 hover:bg-dark-100 
-           focus:ring-dark-300;
+    @apply btn bg-transparent text-text-secondary hover:bg-primary-50
+           focus:ring-primary-200;
   }
   .btn-outline {
-    @apply btn border border-dark-200 bg-white text-dark-700 hover:bg-dark-50 
-           hover:border-dark-300 focus:ring-primary-400;
-  }
-
-  /* Cards */
-  .card {
-    @apply bg-white rounded-2xl border border-dark-100 shadow-card p-5 transition-all duration-200;
-  }
-  .card-hover {
-    @apply card hover:shadow-elevated hover:-translate-y-0.5;
-  }
-  .card-glass {
-    @apply rounded-2xl border border-white/20 bg-white/80 backdrop-blur-md shadow-card p-5;
+    @apply btn border border-primary-200 bg-white text-text hover:bg-primary-50
+           focus:ring-primary-200;
   }
 
   /* Inputs */
   .input {
-    @apply w-full px-4 py-2.5 text-sm bg-dark-50 border border-dark-200 rounded-xl
+    @apply w-full px-4 py-2.5 text-sm bg-white border border-primary-100 rounded-lg
            font-medium transition-all duration-200
-           focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-400
-           placeholder:text-dark-400;
+           focus:outline-none focus:ring-2 focus:ring-primary-200/50 focus:border-primary-200
+           placeholder:text-text-muted;
   }
 
   /* Badges */
   .badge {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg;
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md;
   }
   .badge-primary {
-    @apply badge bg-primary-50 text-primary-700;
+    @apply badge bg-primary-100 text-primary-800;
+  }
+  .badge-secondary {
+    @apply badge bg-secondary-100 text-secondary-700;
   }
   .badge-success {
-    @apply badge bg-emerald-50 text-emerald-700;
+    @apply badge bg-green-50 text-green-700;
   }
   .badge-warning {
     @apply badge bg-amber-50 text-amber-700;
@@ -78,11 +84,11 @@
     @apply badge bg-red-50 text-red-700;
   }
   .badge-neutral {
-    @apply badge bg-dark-100 text-dark-600;
+    @apply badge bg-gray-100 text-gray-600;
   }
 }
 
-/* Smooth scrollbar */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -91,9 +97,9 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #E5D5C5;
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #D4C0AC;
 }

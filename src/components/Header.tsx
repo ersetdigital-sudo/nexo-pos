@@ -4,10 +4,10 @@ import { IconBell, IconWifi } from "./Icons";
 
 export default function Header({ title }: { title: string }) {
   return (
-    <header className="h-16 bg-white/80 backdrop-blur-md border-b border-dark-100 flex items-center justify-between px-6 sticky top-0 z-20">
-      <h2 className="text-lg font-bold text-dark-800">{title}</h2>
+    <header className="h-16 bg-white/80 backdrop-blur-sm border-b border-primary-100/60 flex items-center justify-between px-6 sticky top-0 z-20">
+      <h2 className="text-lg font-semibold text-text">{title}</h2>
       <div className="flex items-center gap-4">
-        <span className="text-sm font-medium text-dark-400">
+        <span className="text-sm text-text-muted hidden md:block">
           {new Date().toLocaleDateString("id-ID", {
             weekday: "long",
             year: "numeric",
@@ -15,13 +15,13 @@ export default function Header({ title }: { title: string }) {
             day: "numeric",
           })}
         </span>
-        <button className="relative p-2 rounded-xl hover:bg-dark-50 transition-colors">
-          <IconBell className="w-5 h-5 text-dark-400" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+        <button className="relative p-2 rounded-lg hover:bg-primary-50 transition-colors">
+          <IconBell className="w-5 h-5 text-text-muted" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-danger rounded-full" />
         </button>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50">
-          <IconWifi className="w-3.5 h-3.5 text-emerald-600" />
-          <span className="text-xs font-semibold text-emerald-700">Online</span>
+        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-green-50 border border-green-100">
+          <IconWifi className="w-3.5 h-3.5 text-success" />
+          <span className="text-xs font-medium text-success">Online</span>
         </div>
       </div>
     </header>

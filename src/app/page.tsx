@@ -6,10 +6,10 @@ import Link from "next/link";
 import { IconCashier, IconKitchen, IconQueue, IconSelfOrder, IconTrendUp, IconUsers, IconTable, IconProducts, IconCart, IconIngredients, IconQris, IconWhatsapp, IconScanner, IconLoyalty } from "@/components/Icons";
 
 const quickActions = [
-  { href: "/cashier", label: "Buka Kasir", icon: IconCashier, gradient: "from-primary-500 to-primary-700" },
-  { href: "/kitchen", label: "Dapur", icon: IconKitchen, gradient: "from-amber-500 to-orange-600" },
-  { href: "/queue", label: "Antrian", icon: IconQueue, gradient: "from-sky-500 to-blue-600" },
-  { href: "/self-order", label: "Self Order", icon: IconSelfOrder, gradient: "from-emerald-500 to-green-600" },
+  { href: "/cashier", label: "Buka Kasir", icon: IconCashier, bg: "bg-primary-100" },
+  { href: "/kitchen", label: "Dapur", icon: IconKitchen, bg: "bg-amber-50" },
+  { href: "/queue", label: "Antrian", icon: IconQueue, bg: "bg-secondary-50" },
+  { href: "/self-order", label: "Self Order", icon: IconSelfOrder, bg: "bg-green-50" },
 ];
 
 export default function DashboardPage() {
@@ -31,107 +31,107 @@ export default function DashboardPage() {
 
   return (
     <MainLayout title="Dashboard">
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        {quickActions.map((action) => {
-          const Icon = action.icon;
-          return (
-            <Link key={action.href} href={action.href}
-              className="group card-hover p-4 flex flex-col items-start gap-3">
-              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${action.gradient} flex items-center justify-center shadow-soft group-hover:scale-110 transition-transform duration-200`}>
-                <Icon className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-semibold text-sm text-dark-700">{action.label}</span>
-            </Link>
-          );
-        })}
-      </div>
-
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="card p-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium text-dark-400">Pendapatan Hari Ini</span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-              <IconTrendUp className="w-4 h-4 text-emerald-600" />
-            </div>
-          </div>
-          <div className="text-2xl font-bold text-dark-900">Rp {todayRevenue.toLocaleString("id-ID")}</div>
-          <p className="text-xs text-dark-400 mt-1">{todayOrders.length} transaksi</p>
+      {/* Bento Grid Layout */}
+      <div className="grid grid-cols-12 gap-4">
+        
+        {/* Quick Actions - Full width */}
+        <div className="col-span-12 grid grid-cols-2 md:grid-cols-4 gap-3">
+          {quickActions.map((action) => {
+            const Icon = action.icon;
+            return (
+              <Link key={action.href} href={action.href}
+                className="bento-card-hover flex items-center gap-3 group">
+                <div className={`w-10 h-10 rounded-lg ${action.bg} flex items-center justify-center group-hover:scale-105 transition-transform`}>
+                  <Icon className="w-5 h-5 text-text-secondary" />
+                </div>
+                <span className="font-medium text-sm text-text">{action.label}</span>
+              </Link>
+            );
+          })}
         </div>
 
-        <div className="card p-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium text-dark-400">Pesanan Aktif</span>
-            <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center">
-              <IconQueue className="w-4 h-4 text-primary-600" />
+        {/* Revenue - Large card */}
+        <div className="col-span-12 md:col-span-6 lg:col-span-3 bento-card-accent">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-md bg-primary-200/60 flex items-center justify-center">
+              <IconTrendUp className="w-4 h-4 text-primary-700" />
             </div>
+            <span className="text-sm text-text-secondary">Pendapatan Hari Ini</span>
           </div>
-          <div className="text-2xl font-bold text-dark-900">{activeOrders.length}</div>
-          <p className="text-xs text-dark-400 mt-1">sedang diproses</p>
+          <div className="text-2xl font-bold text-text">Rp {todayRevenue.toLocaleString("id-ID")}</div>
+          <p className="text-xs text-text-muted mt-1">{todayOrders.length} transaksi</p>
         </div>
 
-        <div className="card p-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium text-dark-400">Meja Terpakai</span>
-            <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+        {/* Active Orders */}
+        <div className="col-span-6 md:col-span-3 lg:col-span-3 bento-card">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-md bg-secondary-50 flex items-center justify-center">
+              <IconQueue className="w-4 h-4 text-secondary-500" />
+            </div>
+            <span className="text-sm text-text-secondary">Pesanan Aktif</span>
+          </div>
+          <div className="text-2xl font-bold text-text">{activeOrders.length}</div>
+          <p className="text-xs text-text-muted mt-1">sedang diproses</p>
+        </div>
+
+        {/* Tables */}
+        <div className="col-span-6 md:col-span-3 lg:col-span-3 bento-card">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-md bg-amber-50 flex items-center justify-center">
               <IconTable className="w-4 h-4 text-amber-600" />
             </div>
+            <span className="text-sm text-text-secondary">Meja Terpakai</span>
           </div>
-          <div className="text-2xl font-bold text-dark-900">{occupiedTables.length}<span className="text-base text-dark-400">/{tables.length}</span></div>
-          <p className="text-xs text-dark-400 mt-1">meja aktif</p>
+          <div className="text-2xl font-bold text-text">{occupiedTables.length}<span className="text-base text-text-muted">/{tables.length}</span></div>
+          <p className="text-xs text-text-muted mt-1">meja aktif</p>
         </div>
 
-        <div className="card p-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium text-dark-400">Total Pelanggan</span>
-            <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
-              <IconUsers className="w-4 h-4 text-violet-600" />
+        {/* Customers */}
+        <div className="col-span-12 md:col-span-6 lg:col-span-3 bento-card">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-md bg-green-50 flex items-center justify-center">
+              <IconUsers className="w-4 h-4 text-green-600" />
             </div>
+            <span className="text-sm text-text-secondary">Total Pelanggan</span>
           </div>
-          <div className="text-2xl font-bold text-dark-900">{customers.length}</div>
-          <p className="text-xs text-dark-400 mt-1">member terdaftar</p>
+          <div className="text-2xl font-bold text-text">{customers.length}</div>
+          <p className="text-xs text-text-muted mt-1">member terdaftar</p>
         </div>
-      </div>
 
-
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Orders */}
-        <div className="lg:col-span-2 card">
-          <h3 className="font-semibold text-dark-800 mb-4 flex items-center gap-2">
-            <IconQueue className="w-4 h-4 text-primary-500" />
+        {/* Recent Orders - Takes 8 cols */}
+        <div className="col-span-12 lg:col-span-8 bento-card-lg">
+          <h3 className="font-semibold text-text mb-4 flex items-center gap-2">
+            <IconOrders className="w-4 h-4 text-primary-500" />
             Pesanan Terbaru
           </h3>
           {orders.length === 0 ? (
             <div className="text-center py-12">
-              <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-dark-50 flex items-center justify-center">
-                <IconCart className="w-8 h-8 text-dark-300" />
+              <div className="w-14 h-14 mx-auto mb-3 rounded-xl bg-surface-200 flex items-center justify-center">
+                <IconCart className="w-7 h-7 text-text-muted" />
               </div>
-              <p className="font-medium text-dark-400">Belum ada pesanan hari ini</p>
-              <p className="text-sm text-dark-300 mt-1">Mulai transaksi pertama di Kasir</p>
+              <p className="font-medium text-text-secondary">Belum ada pesanan hari ini</p>
+              <p className="text-sm text-text-muted mt-1">Mulai transaksi pertama di Kasir</p>
             </div>
           ) : (
-            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-              {orders.slice(0, 10).map((order) => (
+            <div className="space-y-2 max-h-72 overflow-y-auto">
+              {orders.slice(0, 8).map((order) => (
                 <div key={order.id}
-                  className="flex items-center justify-between p-3 rounded-xl bg-dark-50/50 hover:bg-dark-50 transition-colors">
+                  className="flex items-center justify-between p-3 rounded-lg bg-surface-50 hover:bg-surface-200 transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-white shadow-soft flex items-center justify-center text-sm font-bold text-primary-600">
+                    <div className="w-9 h-9 rounded-md bg-white border border-primary-100 flex items-center justify-center text-xs font-bold text-primary-700">
                       #{order.orderNumber.slice(-3)}
                     </div>
                     <div>
-                      <span className="font-semibold text-sm text-dark-800">Order #{order.orderNumber}</span>
-                      <span className="text-xs text-dark-400 ml-2">{order.items.length} item</span>
+                      <span className="font-medium text-sm text-text">Order #{order.orderNumber}</span>
+                      <span className="text-xs text-text-muted ml-2">{order.items.length} item</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="font-semibold text-sm">Rp {order.total.toLocaleString("id-ID")}</span>
+                    <span className="font-semibold text-sm text-text">Rp {order.total.toLocaleString("id-ID")}</span>
                     <span className={`badge ${
                       order.status === "completed" ? "badge-success" :
                       order.status === "preparing" ? "badge-warning" :
-                      order.status === "ready" ? "badge-primary" :
+                      order.status === "ready" ? "badge-secondary" :
                       order.status === "cancelled" ? "badge-danger" : "badge-neutral"
                     }`}>
                       {order.status}
@@ -143,21 +143,21 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Sidebar Info */}
-        <div className="space-y-4">
+        {/* Right column - stacked cards */}
+        <div className="col-span-12 lg:col-span-4 space-y-4">
           {/* Low Stock */}
-          <div className="card">
-            <h3 className="font-semibold text-dark-800 mb-3 flex items-center gap-2">
-              <IconIngredients className="w-4 h-4 text-red-500" />
+          <div className="bento-card">
+            <h3 className="font-semibold text-text mb-3 flex items-center gap-2">
+              <IconIngredients className="w-4 h-4 text-danger" />
               Stok Rendah
             </h3>
             {lowStockIngredients.length === 0 ? (
-              <p className="text-sm text-dark-400">Semua stok aman</p>
+              <p className="text-sm text-text-muted">Semua stok aman</p>
             ) : (
               <div className="space-y-2">
                 {lowStockIngredients.map((ing) => (
                   <div key={ing.id} className="flex justify-between items-center text-sm">
-                    <span className="text-dark-600">{ing.name}</span>
+                    <span className="text-text-secondary">{ing.name}</span>
                     <span className="badge-danger">{ing.currentStock} {ing.unit}</span>
                   </div>
                 ))}
@@ -165,25 +165,25 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Products */}
-          <div className="card bg-gradient-to-br from-primary-500 to-primary-700 text-white border-0">
+          {/* Products count */}
+          <div className="bento-card-accent">
             <div className="flex items-center gap-2 mb-2">
-              <IconProducts className="w-4 h-4" />
-              <h3 className="font-semibold">Total Produk</h3>
+              <IconProducts className="w-4 h-4 text-primary-600" />
+              <span className="font-medium text-sm text-primary-800">Total Produk</span>
             </div>
-            <div className="text-3xl font-bold">{products.length}</div>
-            <p className="text-sm opacity-80 mt-1">item aktif di menu</p>
+            <div className="text-2xl font-bold text-primary-900">{products.length}</div>
+            <p className="text-xs text-primary-600 mt-1">item aktif di menu</p>
           </div>
 
           {/* Features */}
-          <div className="card">
-            <h3 className="font-semibold text-dark-800 mb-3">Fitur Aktif</h3>
-            <div className="space-y-2 text-sm text-dark-500">
-              <div className="flex items-center gap-2"><IconQris className="w-4 h-4 text-primary-500" /> QRIS Payment</div>
-              <div className="flex items-center gap-2"><IconWhatsapp className="w-4 h-4 text-emerald-500" /> WhatsApp Receipt</div>
+          <div className="bento-card">
+            <h3 className="font-medium text-sm text-text mb-3">Fitur Aktif</h3>
+            <div className="space-y-2.5 text-sm text-text-secondary">
+              <div className="flex items-center gap-2"><IconQris className="w-4 h-4 text-secondary-400" /> QRIS Payment</div>
+              <div className="flex items-center gap-2"><IconWhatsapp className="w-4 h-4 text-green-500" /> WhatsApp Receipt</div>
               <div className="flex items-center gap-2"><IconScanner className="w-4 h-4 text-amber-500" /> Auto Barcode Scan</div>
-              <div className="flex items-center gap-2"><IconKitchen className="w-4 h-4 text-orange-500" /> Kitchen Display</div>
-              <div className="flex items-center gap-2"><IconLoyalty className="w-4 h-4 text-yellow-500" /> Loyalty Points</div>
+              <div className="flex items-center gap-2"><IconKitchen className="w-4 h-4 text-orange-400" /> Kitchen Display</div>
+              <div className="flex items-center gap-2"><IconLoyalty className="w-4 h-4 text-primary-400" /> Loyalty Points</div>
             </div>
           </div>
         </div>
