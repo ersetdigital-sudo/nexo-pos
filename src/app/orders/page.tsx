@@ -6,7 +6,7 @@ import { useStore, Order } from "@/store";
 import { IconOrders, IconTrendUp, IconWhatsapp, IconPrinter, IconX, IconCart, IconCash, IconQris, IconCard } from "@/components/Icons";
 
 export default function OrdersPage() {
-  const { orders } = useStore();
+  const { orders, updateOrderStatus } = useStore();
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
   const [showReceipt, setShowReceipt] = useState(false);
@@ -226,7 +226,7 @@ ${selectedOrderData.loyaltyPointsEarned > 0 ? `<div class="center" style="font-s
         {/* Desktop Detail Panel */}
         {selectedOrderData && (
           <div className="hidden lg:block w-[320px] flex-shrink-0">
-            <OrderDetailPanel order={selectedOrderData} onPrint={handlePrintReceipt} onPrintWindow={printReceiptWindow} />
+            <OrderDetailPanel order={selectedOrderData} onPrint={handlePrintReceipt} onPrintWindow={printReceiptWindow} onClose={() => setSelectedOrder(null)} onStatusChange={(status) => updateOrderStatus(selectedOrderData.id, status)} />
           </div>
         )}
       </div>
@@ -243,7 +243,7 @@ ${selectedOrderData.loyaltyPointsEarned > 0 ? `<div class="center" style="font-s
               </button>
             </div>
             <div className="p-4">
-              <OrderDetailContent order={selectedOrderData} onPrint={printReceiptWindow} />
+              <OrderDetailContent order={selectedOrderData} onPrint={printReceiptWindow} onStatusChange={(status) => updateOrderStatus(selectedOrderData.id, status)} />
             </div>
           </div>
         </div>
@@ -262,17 +262,30 @@ ${selectedOrderData.loyaltyPointsEarned > 0 ? `<div class="center" style="font-s
 }
 
 /* ─── Detail Panel (Desktop) ─── */
-function OrderDetailPanel({ order, onPrint, onPrintWindow }: { order: Order; onPrint: () => void; onPrintWindow: () => void }) {
+function OrderDetailPanel({ order, onPrint, onPrintWindow, onClose, onStatusChange }: { order: Order; onPrint: () => void; onPrintWindow: () => void; onClose: () => void; onStatusChange: (status: Order["status"]) => void }) {
   return (
     <div className="bg-white rounded-xl border border-[#E5E7EB] p-4 sticky top-24">
-      <h3 className="font-bold text-[#1C1C1C] mb-4 text-sm">Detail Pesanan</h3>
-      <OrderDetailContent order={order} onPrint={onPrintWindow} />
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-bold text-[#1C1C1C] text-sm">Detail Pesanan</h3>
+        <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors" title="Tutup">
+          <IconX className="w-4 h-4 text-[#6B7280]" />
+        </button>
+      </div>
+      <OrderDetailContent order={order} onPrint={onPrintWindow} onStatusChange={onStatusChange} />
     </div>
   );
 }
 
 /* ─── Detail Content (shared mobile + desktop) ─── */
-function OrderDetailContent({ order, onPrint }: { order: Order; onPrint: () => void }) {
+function OrderDetailContent({ order, onPrint, onStatusChange }: { order: Order; onPrint: () => void; onStatusChange: (status: Order["status"]) => void }) {
+  const statusFlow: { value: Order["status"]; label: string; color: string }[] = [
+    { value: "pending", label: "Pending", color: "bg-gray-100 text-gray-700" },
+    { value: "preparing", label: "Proses", color: "bg-amber-50 text-amber-700" },
+    { value: "ready", label: "Siap", color: "bg-blue-50 text-blue-700" },
+    { value: "completed", label: "Selesai", color: "bg-green-50 text-green-700" },
+    { value: "cancelled", label: "Batal", color: "bg-red-50 text-red-700" },
+  ];
+
   return (
     <>
       <div className="space-y-2 mb-4">
@@ -291,6 +304,27 @@ function OrderDetailContent({ order, onPrint }: { order: Order; onPrint: () => v
         <div className="flex justify-between text-xs text-[#6B7280]">
           <span>Pembayaran</span>
           <span className="uppercase">{order.paymentMethod}</span>
+        </div>
+      </div>
+
+      {/* Status Changer */}
+      <div className="mb-4">
+        <div className="text-[11px] uppercase tracking-wide text-[#6B7280] font-semibold mb-2">Ubah Status</div>
+        <div className="flex flex-wrap gap-1.5">
+          {statusFlow.map((s) => (
+            <button
+              key={s.value}
+              onClick={() => onStatusChange(s.value)}
+              disabled={order.status === s.value}
+              className={`px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-all min-h-[32px] border ${
+                order.status === s.value
+                  ? `${s.color} border-current ring-1 ring-current/20`
+                  : "border-[#E5E7EB] text-[#6B7280] hover:bg-gray-50"
+              } disabled:opacity-60 disabled:cursor-default`}
+            >
+              {s.label}
+            </button>
+          ))}
         </div>
       </div>
 
