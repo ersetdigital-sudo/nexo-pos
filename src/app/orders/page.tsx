@@ -54,43 +54,53 @@ export default function OrdersPage() {
 
   const printReceiptWindow = () => {
     if (!selectedOrderData) return;
-    const items = selectedOrderData.items.map(i =>
-      `${i.product.name.padEnd(18).slice(0, 18)} x${i.quantity}  Rp${i.subtotal.toLocaleString("id-ID")}`
-    ).join("\n");
     const subtotal = selectedOrderData.items.reduce((s, i) => s + i.subtotal, 0);
+    const service = Math.round(subtotal * 0.05);
     const tax = Math.round(subtotal * 0.11);
 
-    const printWindow = window.open("", "_blank", "width=350,height=600");
+    const printWindow = window.open("", "_blank", "width=380,height=650");
     if (!printWindow) return;
     printWindow.document.write(`<!DOCTYPE html><html><head><title>Receipt #${selectedOrderData.orderNumber}</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Courier New',monospace;font-size:12px;padding:20px;max-width:300px;margin:0 auto;color:#1C1C1C}
-.center{text-align:center}.bold{font-weight:bold}.divider{border:none;border-top:1px dashed #ccc;margin:8px 0}
-.row{display:flex;justify-content:space-between}.mt{margin-top:6px}.mb{margin-bottom:6px}
+<style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Courier New',monospace;font-size:12px;padding:24px 20px;max-width:360px;margin:0 auto;color:#374151;line-height:1.6}
+.center{text-align:center}
+.bold{font-weight:bold}
+.divider{color:#D1D5DB;text-align:center;margin:8px 0;font-size:12px}
+.row{display:flex;justify-content:space-between;margin:2px 0}
+.item-name{font-size:13px;font-weight:bold;color:#111827}
+.item-detail{font-size:11px;color:#6B7280;margin-top:2px}
+.total-row{display:flex;justify-content:space-between;align-items:baseline}
+.total-label{font-size:16px;font-weight:bold;color:#111827;text-transform:uppercase}
+.total-value{font-size:16px;font-weight:bold;color:#111827}
+.footer{text-align:center;margin-top:12px;font-style:italic;color:#6B7280}
+.btn-row{text-align:center;margin-top:24px}
+.btn{border:none;padding:12px 28px;border-radius:999px;font-size:12px;cursor:pointer;font-family:inherit;margin:4px}
+.btn-print{background:#111827;color:white}
+.btn-close{background:white;color:#6B7280;border:1px solid #D1D5DB}
 @media print{.no-print{display:none}body{padding:8px}}</style></head>
 <body>
-<div class="center bold" style="font-size:14px">NEXO POS</div>
-<div class="center" style="font-size:10px;color:#6B7280">Jl. Digital No. 1, Jakarta</div>
-<div class="center" style="font-size:10px;color:#6B7280">Tel: 08123456789</div>
-<hr class="divider">
-<div class="row"><span>No:</span><span class="bold">#${selectedOrderData.orderNumber}</span></div>
-<div class="row"><span>Tgl:</span><span>${new Date(selectedOrderData.createdAt).toLocaleString("id-ID")}</span></div>
-<div class="row"><span>Tipe:</span><span>${selectedOrderData.tableNumber ? "DINE IN - Meja " + selectedOrderData.tableNumber : "TAKE AWAY"}</span></div>
-<div class="row"><span>Bayar:</span><span>${selectedOrderData.paymentMethod.toUpperCase()}</span></div>
-${selectedOrderData.customerName ? `<div class="row"><span>Pelanggan:</span><span>${selectedOrderData.customerName}</span></div>` : ""}
-<hr class="divider">
-<div class="bold mb">PESANAN:</div>
-${selectedOrderData.items.map(i => `<div class="row"><span>${i.product.name} x${i.quantity}</span><span>Rp${i.subtotal.toLocaleString("id-ID")}</span></div>`).join("")}
-<hr class="divider">
-<div class="row"><span>Subtotal</span><span>Rp${subtotal.toLocaleString("id-ID")}</span></div>
-<div class="row"><span>Pajak (11%)</span><span>Rp${tax.toLocaleString("id-ID")}</span></div>
-<div class="row bold" style="font-size:14px;margin-top:4px"><span>TOTAL</span><span>Rp${selectedOrderData.total.toLocaleString("id-ID")}</span></div>
-<hr class="divider">
-${selectedOrderData.loyaltyPointsEarned > 0 ? `<div class="center" style="font-size:10px">Poin didapat: +${selectedOrderData.loyaltyPointsEarned} pts</div>` : ""}
-<div class="center mt" style="font-size:10px;color:#6B7280">Terima kasih atas kunjungan Anda!</div>
-<div class="center" style="font-size:10px;color:#6B7280">── Powered by Nexo POS ──</div>
-<div class="center mt no-print" style="margin-top:20px">
-<button onclick="window.print()" style="background:#1C1C1C;color:white;border:none;padding:10px 24px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit">Print Receipt</button>
-<button onclick="window.close()" style="background:white;color:#1C1C1C;border:1px solid #E5E7EB;padding:10px 24px;border-radius:6px;font-size:12px;cursor:pointer;margin-left:8px;font-family:inherit">Close</button>
+<div class="center"><div style="font-size:16px;font-weight:bold;color:#111827;text-transform:uppercase;letter-spacing:1px">NEXO POS</div>
+<div style="font-size:12px;color:#6B7280;margin-top:2px">Jl. Digital No. 1, Jakarta</div></div>
+<div class="divider">────────────────────────────</div>
+<div class="row"><span>ID</span><span class="bold" style="color:#111827">#${selectedOrderData.orderNumber}</span></div>
+<div class="row"><span>Date</span><span>${new Date(selectedOrderData.createdAt).toLocaleString("id-ID")}</span></div>
+<div class="row"><span>Type</span><span>${selectedOrderData.tableNumber ? "Dine In | Table: " + selectedOrderData.tableNumber : "Take Away"}</span></div>
+<div class="row"><span>Payment</span><span>${selectedOrderData.paymentMethod.toUpperCase()}</span></div>
+${selectedOrderData.customerName ? `<div class="row"><span>Kasir</span><span>${selectedOrderData.customerName}</span></div>` : ""}
+<div class="divider">────────────────────────────</div>
+${selectedOrderData.items.map(i => `<div style="margin-bottom:8px"><div class="row"><span class="item-name">${i.product.name}</span><span class="item-name">Rp${i.subtotal.toLocaleString("id-ID")}</span></div><div class="item-detail">${i.quantity} x Rp${(i.subtotal / i.quantity).toLocaleString("id-ID")}</div>${i.selectedVariations && i.selectedVariations.length > 0 ? `<div class="item-detail">${i.selectedVariations.map(v => { const vr = i.product.variations?.find(pv => pv.id === v.variationId); const opt = vr?.options.find(o => o.id === v.optionId); return vr?.name + ": " + opt?.label; }).join(" • ")}</div>` : ""}</div>`).join("")}
+<div class="divider">────────────────────────────</div>
+<div class="row" style="color:#6B7280"><span>Subtotal</span><span>Rp${subtotal.toLocaleString("id-ID")}</span></div>
+<div class="row" style="color:#6B7280"><span>Service (5%)</span><span>Rp${service.toLocaleString("id-ID")}</span></div>
+<div class="row" style="color:#6B7280"><span>Tax (11%)</span><span>Rp${tax.toLocaleString("id-ID")}</span></div>
+<div class="divider">────────────────────────────</div>
+<div class="total-row"><span class="total-label">TOTAL</span><span class="total-value">Rp${selectedOrderData.total.toLocaleString("id-ID")}</span></div>
+<div class="divider">────────────────────────────</div>
+${selectedOrderData.loyaltyPointsEarned > 0 ? `<div class="center" style="font-size:11px;color:#6B7280">Poin didapat: +${selectedOrderData.loyaltyPointsEarned} pts</div>` : ""}
+<div class="footer">Thank you for visiting!</div>
+<div class="btn-row no-print">
+<button onclick="window.print()" class="btn btn-print">Print Receipt</button>
+<button onclick="window.close()" class="btn btn-close">Close</button>
 </div>
 </body></html>`);
     printWindow.document.close();
@@ -369,64 +379,99 @@ function OrderDetailContent({ order, onPrint, onStatusChange }: { order: Order; 
 /* ─── Receipt Modal View ─── */
 function ReceiptView({ order, onClose, onPrint }: { order: Order; onClose: () => void; onPrint: () => void }) {
   const subtotal = order.items.reduce((s, i) => s + i.subtotal, 0);
+  const service = Math.round(subtotal * 0.05);
   const tax = Math.round(subtotal * 0.11);
 
-  return (
-    <div className="p-5">
-      {/* Receipt Content - monospace */}
-      <div className="font-mono text-xs text-[#1C1C1C] leading-relaxed">
-        <div className="text-center font-bold text-sm mb-1">NEXO POS</div>
-        <div className="text-center text-[10px] text-[#6B7280]">Jl. Digital No. 1, Jakarta</div>
-        <div className="text-center text-[10px] text-[#6B7280] mb-2">Tel: 08123456789</div>
-        <div className="text-[#6B7280] text-center">────────────────────────────</div>
+  const divider = "────────────────────────────";
 
-        <div className="mt-2 space-y-0.5">
-          <div className="flex justify-between"><span>No:</span><span className="font-bold">#{order.orderNumber}</span></div>
-          <div className="flex justify-between"><span>Tgl:</span><span>{new Date(order.createdAt).toLocaleString("id-ID")}</span></div>
-          <div className="flex justify-between"><span>Tipe:</span><span>{order.tableNumber ? `DINE IN Meja ${order.tableNumber}` : "TAKE AWAY"}</span></div>
-          <div className="flex justify-between"><span>Bayar:</span><span>{order.paymentMethod.toUpperCase()}</span></div>
-          {order.customerName && <div className="flex justify-between"><span>Customer:</span><span>{order.customerName}</span></div>}
+  return (
+    <div className="max-w-[360px] mx-auto bg-white rounded-xl">
+      {/* Receipt Content */}
+      <div className="px-5 py-6 font-mono text-[#374151] leading-relaxed">
+        {/* Header */}
+        <div className="text-center mb-2">
+          <div className="text-[16px] font-bold text-[#111827] uppercase tracking-wide">NEXO POS</div>
+          <div className="text-[12px] text-[#6B7280] mt-0.5">Jl. Digital No. 1, Jakarta</div>
         </div>
 
-        <div className="text-[#6B7280] text-center mt-2">────────────────────────────</div>
+        {/* Divider */}
+        <div className="text-[#D1D5DB] text-center text-[12px] my-2 select-none">{divider}</div>
 
-        <div className="mt-2 space-y-1">
+        {/* Order Info */}
+        <div className="space-y-1 text-[12px]">
+          <div className="flex justify-between"><span>ID</span><span className="font-bold text-[#111827]">#{order.orderNumber}</span></div>
+          <div className="flex justify-between"><span>Date</span><span>{new Date(order.createdAt).toLocaleString("id-ID")}</span></div>
+          <div className="flex justify-between"><span>Type</span><span>{order.tableNumber ? `Dine In | Table: ${order.tableNumber}` : "Take Away"}</span></div>
+          <div className="flex justify-between"><span>Payment</span><span>{order.paymentMethod.toUpperCase()}</span></div>
+          {order.customerName && <div className="flex justify-between"><span>Kasir</span><span>{order.customerName}</span></div>}
+        </div>
+
+        {/* Divider */}
+        <div className="text-[#D1D5DB] text-center text-[12px] my-2 select-none">{divider}</div>
+
+        {/* Items */}
+        <div className="space-y-2.5">
           {order.items.map((item, i) => (
             <div key={i}>
-              <div className="flex justify-between">
-                <span className="truncate mr-2">{item.product.name}</span>
-                <span className="flex-shrink-0">x{item.quantity}</span>
+              <div className="flex justify-between text-[13px] font-bold text-[#111827]">
+                <span className="truncate mr-3">{item.product.name}</span>
+                <span className="flex-shrink-0">Rp{item.subtotal.toLocaleString("id-ID")}</span>
               </div>
-              <div className="text-right text-[#6B7280]">Rp {item.subtotal.toLocaleString("id-ID")}</div>
+              <div className="text-[11px] text-[#6B7280] mt-0.5">
+                {item.quantity} x Rp{(item.subtotal / item.quantity).toLocaleString("id-ID")}
+              </div>
+              {item.selectedVariations && item.selectedVariations.length > 0 && (
+                <div className="text-[11px] text-[#6B7280]">
+                  {item.selectedVariations.map((v) => {
+                    const variation = item.product.variations?.find((pv) => pv.id === v.variationId);
+                    const option = variation?.options.find((o) => o.id === v.optionId);
+                    return `${variation?.name}: ${option?.label}`;
+                  }).join(" • ")}
+                </div>
+              )}
             </div>
           ))}
         </div>
 
-        <div className="text-[#6B7280] text-center mt-2">────────────────────────────</div>
+        {/* Divider */}
+        <div className="text-[#D1D5DB] text-center text-[12px] my-2 select-none">{divider}</div>
 
-        <div className="mt-2 space-y-0.5">
-          <div className="flex justify-between"><span>Subtotal</span><span>Rp {subtotal.toLocaleString("id-ID")}</span></div>
-          <div className="flex justify-between"><span>Pajak (11%)</span><span>Rp {tax.toLocaleString("id-ID")}</span></div>
-          <div className="flex justify-between font-bold text-sm mt-1"><span>TOTAL</span><span>Rp {order.total.toLocaleString("id-ID")}</span></div>
+        {/* Totals */}
+        <div className="space-y-1 text-[12px] text-[#6B7280]">
+          <div className="flex justify-between"><span>Subtotal</span><span>Rp{subtotal.toLocaleString("id-ID")}</span></div>
+          <div className="flex justify-between"><span>Service (5%)</span><span>Rp{service.toLocaleString("id-ID")}</span></div>
+          <div className="flex justify-between"><span>Tax (11%)</span><span>Rp{tax.toLocaleString("id-ID")}</span></div>
         </div>
 
-        <div className="text-[#6B7280] text-center mt-2">────────────────────────────</div>
+        {/* Divider */}
+        <div className="text-[#D1D5DB] text-center text-[12px] my-2 select-none">{divider}</div>
 
-        {order.loyaltyPointsEarned > 0 && (
-          <div className="text-center text-[10px] text-[#6B7280] mt-1">Poin: +{order.loyaltyPointsEarned} pts</div>
-        )}
-        <div className="text-center text-[10px] text-[#6B7280] mt-2">Terima kasih!</div>
-        <div className="text-center text-[10px] text-[#6B7280]">── Powered by Nexo POS ──</div>
+        {/* Grand Total */}
+        <div className="flex justify-between items-baseline">
+          <span className="text-[16px] font-bold text-[#111827] uppercase">TOTAL</span>
+          <span className="text-[16px] font-bold text-[#111827]">Rp{order.total.toLocaleString("id-ID")}</span>
+        </div>
+
+        {/* Divider */}
+        <div className="text-[#D1D5DB] text-center text-[12px] my-2 select-none">{divider}</div>
+
+        {/* Footer */}
+        <div className="text-center mt-3">
+          {order.loyaltyPointsEarned > 0 && (
+            <div className="text-[11px] text-[#6B7280] mb-1">Poin didapat: +{order.loyaltyPointsEarned} pts</div>
+          )}
+          <div className="text-[12px] text-[#6B7280] italic">Thank you for visiting!</div>
+        </div>
       </div>
 
       {/* Buttons */}
-      <div className="flex gap-2 mt-5">
+      <div className="px-5 pb-5 space-y-2">
         <button onClick={onPrint}
-          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 rounded-lg bg-[#1C1C1C] text-white text-xs font-medium hover:bg-gray-800 min-h-[44px]">
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-[#111827] text-white text-xs font-medium hover:bg-gray-800 min-h-[44px] transition-colors">
           <IconPrinter className="w-4 h-4" /> Print Receipt
         </button>
         <button onClick={onClose}
-          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 rounded-lg border border-[#E5E7EB] text-xs font-medium text-[#1C1C1C] hover:bg-gray-50 min-h-[44px]">
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-full border border-[#D1D5DB] text-xs font-medium text-[#6B7280] hover:bg-gray-50 min-h-[44px] transition-colors">
           Close
         </button>
       </div>
