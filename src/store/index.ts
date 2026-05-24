@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 // Types
 export interface ProductVariation {
@@ -163,7 +164,7 @@ const sampleCustomers: Customer[] = [
   { id: "c3", name: "Ahmad Wijaya", phone: "08345678901", loyaltyPoints: 420, totalSpent: 840000, visitCount: 20 },
 ];
 
-export const useStore = create<POSStore>((set, get) => ({
+export const useStore = create<POSStore>()(persist((set, get) => ({
   // Products
   products: sampleProducts,
   categories: ["Semua", "Makanan", "Minuman", "Snack"],
@@ -249,4 +250,17 @@ export const useStore = create<POSStore>((set, get) => ({
   taxRate: 0.11,
   loyaltyPointsPerAmount: 10000,
   setSettings: (settings) => set((state) => ({ ...state, ...settings })),
+}), {
+  name: "nexo-pos-storage",
+  partialize: (state) => ({
+    orders: state.orders,
+    products: state.products,
+    customers: state.customers,
+    tables: state.tables,
+    ingredientStock: state.ingredientStock,
+    storeName: state.storeName,
+    storePhone: state.storePhone,
+    taxRate: state.taxRate,
+    loyaltyPointsPerAmount: state.loyaltyPointsPerAmount,
+  }),
 }));
