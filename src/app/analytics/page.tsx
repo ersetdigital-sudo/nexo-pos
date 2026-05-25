@@ -117,11 +117,11 @@ export default function AnalyticsPage() {
         </div>
         {filterType === "date" && (
           <input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)}
-            className="px-3 py-2 text-xs border border-[#E5E7EB] rounded-full bg-white text-[#374151] min-h-[36px] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]/20" />
+            className="px-3 py-2 text-xs border border-[#E5E7EB] rounded-full bg-white text-[#111827] min-h-[36px] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]/20 [&::-webkit-datetime-edit]:text-[#111827] [&::-webkit-datetime-edit-fields-wrapper]:text-[#111827] [&::-webkit-calendar-picker-indicator]:opacity-100" />
         )}
         {filterType === "month" && (
           <input type="month" value={filterMonth} onChange={(e) => setFilterMonth(e.target.value)}
-            className="px-3 py-2 text-xs border border-[#E5E7EB] rounded-full bg-white text-[#374151] min-h-[36px] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]/20" />
+            className="px-3 py-2 text-xs border border-[#E5E7EB] rounded-full bg-white text-[#111827] min-h-[36px] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]/20 [&::-webkit-datetime-edit]:text-[#111827] [&::-webkit-datetime-edit-fields-wrapper]:text-[#111827] [&::-webkit-calendar-picker-indicator]:opacity-100" />
         )}
         {(filterDate || filterMonth) && (
           <button onClick={() => { setFilterDate(""); setFilterMonth(""); }}
