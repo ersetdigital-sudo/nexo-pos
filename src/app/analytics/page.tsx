@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import MainLayout from "@/components/MainLayout";
 import { useStore } from "@/store";
 import { IconTrendUp, IconCart, IconUsers, IconCash, IconQris, IconCard, IconProducts, IconTable, IconLoyalty, IconOrders } from "@/components/Icons";
@@ -7,17 +8,33 @@ import { IconTrendUp, IconCart, IconUsers, IconCash, IconQris, IconCard, IconPro
 export default function AnalyticsPage() {
   const { orders, products, customers, tables } = useStore();
 
-  // --- Calculations ---
-  const completedOrders = orders.filter((o) => o.status === "completed");
+  // Filter state
+  const [filterType, setFilterType] = useState<"all" | "date" | "month">("all");
+  const [filterDate, setFilterDate] = useState("");
+  const [filterMonth, setFilterMonth] = useState("");
+
+  // Filter orders based on selection
+  const filteredOrders = orders.filter((o) => {
+    if (filterType === "date" && filterDate) {
+      return new Date(o.createdAt).toISOString().slice(0, 10) === filterDate;
+    }
+    if (filterType === "month" && filterMonth) {
+      return new Date(o.createdAt).toISOString().slice(0, 7) === filterMonth;
+    }
+    return true;
+  });
+
+  // --- Calculations (use filteredOrders) ---
+  const completedOrders = filteredOrders.filter((o) => o.status === "completed");
   const totalRevenue = completedOrders.reduce((sum, o) => sum + o.total, 0);
-  const totalOrders = orders.length;
+  const totalOrders = filteredOrders.length;
   const avgOrderValue = completedOrders.length > 0 ? Math.round(totalRevenue / completedOrders.length) : 0;
-  const cancelledOrders = orders.filter((o) => o.status === "cancelled").length;
+  const cancelledOrders = filteredOrders.filter((o) => o.status === "cancelled").length;
   const cancelRate = totalOrders > 0 ? Math.round((cancelledOrders / totalOrders) * 100) : 0;
 
   // Top Products
   const productSales: Record<string, { name: string; image: string; qty: number; revenue: number }> = {};
-  orders.filter(o => o.status !== "cancelled").forEach((order) => {
+  filteredOrders.filter(o => o.status !== "cancelled").forEach((order) => {
     order.items.forEach((item) => {
       const key = item.product.id;
       if (!productSales[key]) {
@@ -36,13 +53,13 @@ export default function AnalyticsPage() {
   const totalPayment = paymentBreakdown.cash + paymentBreakdown.qris + paymentBreakdown.card;
 
   // Order Type (Dine In vs Take Away)
-  const dineInOrders = orders.filter((o) => o.tableNumber && o.status !== "cancelled").length;
-  const takeAwayOrders = orders.filter((o) => !o.tableNumber && o.status !== "cancelled").length;
+  const dineInOrders = filteredOrders.filter((o) => o.tableNumber && o.status !== "cancelled").length;
+  const takeAwayOrders = filteredOrders.filter((o) => !o.tableNumber && o.status !== "cancelled").length;
   const totalTypeOrders = dineInOrders + takeAwayOrders;
 
   // Category Breakdown
   const categorySales: Record<string, number> = {};
-  orders.filter(o => o.status !== "cancelled").forEach((order) => {
+  filteredOrders.filter(o => o.status !== "cancelled").forEach((order) => {
     order.items.forEach((item) => {
       const cat = item.product.category;
       categorySales[cat] = (categorySales[cat] || 0) + item.subtotal;
@@ -65,9 +82,9 @@ export default function AnalyticsPage() {
 
   // Status Distribution
   const statusCounts = {
-    pending: orders.filter((o) => o.status === "pending").length,
-    preparing: orders.filter((o) => o.status === "preparing").length,
-    ready: orders.filter((o) => o.status === "ready").length,
+    pending: filteredOrders.filter((o) => o.status === "pending").length,
+    preparing: filteredOrders.filter((o) => o.status === "preparing").length,
+    ready: filteredOrders.filter((o) => o.status === "ready").length,
     completed: completedOrders.length,
     cancelled: cancelledOrders,
   };
@@ -82,6 +99,38 @@ export default function AnalyticsPage() {
 
   return (
     <MainLayout title="Analitik">
+      {/* Date/Month Filter */}
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 md:mb-6">
+        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
+          <button onClick={() => { setFilterType("all"); setFilterDate(""); setFilterMonth(""); }}
+            className={`px-3 sm:px-4 py-2 text-xs font-medium rounded-full border transition-all whitespace-nowrap min-h-[36px] ${
+              filterType === "all" ? "bg-[#FFF0E6] text-[#F97316] border-[#F97316]" : "bg-white text-[#6B7280] border-[#E5E7EB] hover:bg-gray-50"
+            }`}>Semua</button>
+          <button onClick={() => { setFilterType("date"); setFilterMonth(""); }}
+            className={`px-3 sm:px-4 py-2 text-xs font-medium rounded-full border transition-all whitespace-nowrap min-h-[36px] ${
+              filterType === "date" ? "bg-[#FFF0E6] text-[#F97316] border-[#F97316]" : "bg-white text-[#6B7280] border-[#E5E7EB] hover:bg-gray-50"
+            }`}>Per Tanggal</button>
+          <button onClick={() => { setFilterType("month"); setFilterDate(""); }}
+            className={`px-3 sm:px-4 py-2 text-xs font-medium rounded-full border transition-all whitespace-nowrap min-h-[36px] ${
+              filterType === "month" ? "bg-[#FFF0E6] text-[#F97316] border-[#F97316]" : "bg-white text-[#6B7280] border-[#E5E7EB] hover:bg-gray-50"
+            }`}>Per Bulan</button>
+        </div>
+        {filterType === "date" && (
+          <input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)}
+            className="px-3 py-2 text-xs border border-[#E5E7EB] rounded-full bg-white text-[#374151] min-h-[36px] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]/20" />
+        )}
+        {filterType === "month" && (
+          <input type="month" value={filterMonth} onChange={(e) => setFilterMonth(e.target.value)}
+            className="px-3 py-2 text-xs border border-[#E5E7EB] rounded-full bg-white text-[#374151] min-h-[36px] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]/20" />
+        )}
+        {(filterDate || filterMonth) && (
+          <button onClick={() => { setFilterDate(""); setFilterMonth(""); }}
+            className="text-[10px] sm:text-xs text-[#F97316] font-medium hover:underline whitespace-nowrap">Reset</button>
+        )}
+        {filterType !== "all" && (filterDate || filterMonth) && (
+          <span className="text-[10px] sm:text-xs text-[#6B7280] ml-auto">{filteredOrders.length} pesanan ditemukan</span>
+        )}
+      </div>
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4 md:mb-6">
         <div className="bg-white rounded-xl border border-[#E5E7EB] shadow-sm p-3 sm:p-4">
