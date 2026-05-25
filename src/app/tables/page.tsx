@@ -1,64 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import MainLayout from "@/components/MainLayout";
 import { useStore } from "@/store";
 import { IconQris, IconPrinter, IconTable } from "@/components/Icons";
-
-function generateQRCodeSVG(text: string, size: number = 200): string {
-  const modules = 25;
-  const cellSize = size / modules;
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
-  svg += `<rect width="${size}" height="${size}" fill="white"/>`;
-
-  const hash = (s: string) => {
-    let h = 0;
-    for (let i = 0; i < s.length; i++) {
-      h = ((h << 5) - h + s.charCodeAt(i)) | 0;
-    }
-    return h;
-  };
-
-  const seed = hash(text);
-  const pattern: boolean[][] = Array(modules).fill(null).map(() => Array(modules).fill(false));
-
-  const drawFinder = (sx: number, sy: number) => {
-    for (let y = 0; y < 7; y++) {
-      for (let x = 0; x < 7; x++) {
-        if (y === 0 || y === 6 || x === 0 || x === 6 || (x >= 2 && x <= 4 && y >= 2 && y <= 4)) {
-          pattern[sy + y][sx + x] = true;
-        }
-      }
-    }
-  };
-
-  drawFinder(0, 0);
-  drawFinder(modules - 7, 0);
-  drawFinder(0, modules - 7);
-
-  for (let y = 0; y < modules; y++) {
-    for (let x = 0; x < modules; x++) {
-      if (pattern[y][x]) continue;
-      if ((x < 8 && y < 8) || (x >= modules - 8 && y < 8) || (x < 8 && y >= modules - 8)) continue;
-      const val = hash(`${text}-${x}-${y}-${seed}`) & 0xFFFF;
-      if (val % 3 !== 0) pattern[y][x] = true;
-    }
-  }
-
-  for (let y = 0; y < modules; y++) {
-    for (let x = 0; x < modules; x++) {
-      if (pattern[y][x]) {
-        svg += `<rect x="${x * cellSize}" y="${y * cellSize}" width="${cellSize}" height="${cellSize}" fill="#111827" rx="0.5"/>`;
-      }
-    }
-  }
-  svg += `</svg>`;
-  return svg;
-}
+import QRCode from "qrcode";
 
 export default function TablesPage() {
   const { tables, updateTableStatus, orders, storeName } = useStore();
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
+  const [qrDataUrl, setQrDataUrl] = useState<string>("");
+  const [qrSvgString, setQrSvgString] = useState<string>("");
 
   const getTableOrder = (tableId: string) => {
     const table = tables.find((t) => t.id === tableId);
@@ -68,27 +20,55 @@ export default function TablesPage() {
 
   const selected = tables.find((t) => t.id === selectedTable);
 
-  const getQRUrl = (tableNumber: number) => {
+  const getQRUrl = useCallback((tableNumber: number) => {
     const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://nexo-pos-six.vercel.app";
     return `${baseUrl}/self-order?table=${tableNumber}`;
-  };
+  }, []);
+
+  // Generate real QR code when table is selected
+  useEffect(() => {
+    if (!selected) {
+      setQrDataUrl("");
+      setQrSvgString("");
+      return;
+    }
+    const url = getQRUrl(selected.number);
+
+    // Generate as data URL (PNG) for display
+    QRCode.toDataURL(url, {
+      width: 256,
+      margin: 4,
+      color: { dark: "#000000", light: "#ffffff" },
+      errorCorrectionLevel: "H",
+    }).then((dataUrl) => {
+      setQrDataUrl(dataUrl);
+    });
+
+    // Generate as SVG string for print/download
+    QRCode.toString(url, {
+      type: "svg",
+      width: 256,
+      margin: 4,
+      color: { dark: "#000000", light: "#ffffff" },
+      errorCorrectionLevel: "H",
+    }).then((svg) => {
+      setQrSvgString(svg);
+    });
+  }, [selected, getQRUrl]);
 
   const handleDownloadQR = () => {
-    if (!selected) return;
-    const svgContent = generateQRCodeSVG(getQRUrl(selected.number), 400);
-    const blob = new Blob([svgContent], { type: "image/svg+xml" });
-    const url = URL.createObjectURL(blob);
+    if (!selected || !qrDataUrl) return;
     const a = document.createElement("a");
-    a.href = url;
-    a.download = `qr-meja-${selected.number}.svg`;
+    a.href = qrDataUrl;
+    a.download = `qr-meja-${selected.number}.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   const handlePrintQR = () => {
-    if (!selected) return;
+    if (!selected || !qrSvgString) return;
+    const qrUrl = getQRUrl(selected.number);
     const printWindow = window.open("", "_blank", "width=400,height=600");
     if (!printWindow) return;
     printWindow.document.write(`<!DOCTYPE html><html><head><title>QR Meja ${selected.number}</title>
@@ -97,15 +77,16 @@ export default function TablesPage() {
       .logo{font-size:14px;font-weight:700;color:#111827;margin-bottom:8px;}
       .num{font-size:32px;font-weight:800;color:#111827;margin:16px 0 8px;}
       .sub{font-size:12px;color:#6B7280;}
-      .qr{margin:24px auto;}
+      .qr{margin:24px auto;width:256px;height:256px;}
+      .qr svg{width:256px;height:256px;}
       .url{font-size:10px;color:#9CA3AF;margin-top:16px;word-break:break-all;}
       @media print{body{margin:0;}.card{border:none;}}</style></head>
       <body><div class="card">
       <div class="logo">${storeName}</div>
       <div class="num">MEJA ${selected.number}</div>
       <div class="sub">Scan untuk Self-Order</div>
-      <div class="qr">${generateQRCodeSVG(getQRUrl(selected.number), 250)}</div>
-      <div class="url">${getQRUrl(selected.number)}</div>
+      <div class="qr">${qrSvgString}</div>
+      <div class="url">${qrUrl}</div>
       </div><script>window.onload=function(){window.print();}</script></body></html>`);
     printWindow.document.close();
   };
@@ -158,8 +139,13 @@ export default function TablesPage() {
                 <h3 className="font-bold text-text mb-3 flex items-center justify-center gap-2 text-sm sm:text-base">
                   <IconQris className="w-4 h-4 text-primary-500" /> QR Code Meja
                 </h3>
-                <div className="w-36 h-36 sm:w-44 sm:h-44 mx-auto mb-3 rounded-xl overflow-hidden border border-primary-100/60 bg-white p-2"
-                  dangerouslySetInnerHTML={{ __html: generateQRCodeSVG(getQRUrl(selected.number), 160) }} />
+                <div className="w-[200px] h-[200px] sm:w-[256px] sm:h-[256px] mx-auto mb-3 rounded-xl overflow-hidden border border-primary-100/60 bg-white flex items-center justify-center">
+                  {qrDataUrl ? (
+                    <img src={qrDataUrl} alt={`QR Code Meja ${selected.number}`} className="w-full h-full object-contain" />
+                  ) : (
+                    <span className="text-xs text-text-muted">Generating...</span>
+                  )}
+                </div>
                 <p className="text-[10px] text-text-muted mb-3 break-all px-2">{getQRUrl(selected.number)}</p>
                 <div className="flex gap-2">
                   <button onClick={handlePrintQR} className="btn-primary flex-1 text-xs sm:text-sm py-2.5 min-h-[44px]">
