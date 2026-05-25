@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   IconDashboard, IconCashier, IconCustomerDisplay, IconQueue,
   IconKitchen, IconProducts, IconTable, IconSelfOrder,
-  IconLoyalty, IconIngredients, IconOrders, IconSettings,
+  IconLoyalty, IconIngredients, IconOrders, IconSettings, IconTrendUp,
 } from "./Icons";
 
 const menuItems = [
@@ -15,6 +15,7 @@ const menuItems = [
   { href: "/products", label: "Produk", icon: IconProducts },
   { href: "/tables", label: "Meja & QR", icon: IconTable },
   { href: "/self-order", label: "Self Order", icon: IconSelfOrder },
+  { href: "/analytics", label: "Analitik", icon: IconTrendUp },
   { href: "/loyalty", label: "Loyalty", icon: IconLoyalty },
   { href: "/ingredients", label: "Stok Bahan", icon: IconIngredients },
   { href: "/orders", label: "Riwayat", icon: IconOrders },
