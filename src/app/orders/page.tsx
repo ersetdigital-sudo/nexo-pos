@@ -8,13 +8,18 @@ import { IconOrders, IconTrendUp, IconWhatsapp, IconPrinter, IconX, IconCart, Ic
 export default function OrdersPage() {
   const { orders, updateOrderStatus } = useStore();
   const [filterStatus, setFilterStatus] = useState("all");
+  const [filterDate, setFilterDate] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
   const [showReceipt, setShowReceipt] = useState(false);
   const [showMobileDetail, setShowMobileDetail] = useState(false);
 
-  const filteredOrders = orders.filter((o) => filterStatus === "all" || o.status === filterStatus);
-  const totalRevenue = orders.filter((o) => o.status === "completed").reduce((sum, o) => sum + o.total, 0);
-  const completedCount = orders.filter((o) => o.status === "completed").length;
+  const filteredOrders = orders.filter((o) => {
+    const matchStatus = filterStatus === "all" || o.status === filterStatus;
+    const matchDate = !filterDate || new Date(o.createdAt).toISOString().slice(0, 10) === filterDate;
+    return matchStatus && matchDate;
+  });
+  const totalRevenue = filteredOrders.filter((o) => o.status === "completed").reduce((sum, o) => sum + o.total, 0);
+  const completedCount = filteredOrders.filter((o) => o.status === "completed").length;
 
   const statuses = [
     { value: "all", label: "Semua" }, { value: "pending", label: "Pending" },
@@ -142,7 +147,7 @@ ${selectedOrderData.loyaltyPointsEarned > 0 ? `<div class="center" style="font-s
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-4 pb-1">
+      <div className="flex gap-2 items-center overflow-x-auto scrollbar-hide mb-4 pb-1">
         {statuses.map((s) => (
           <button key={s.value} onClick={() => setFilterStatus(s.value)}
             className={`px-4 py-2 text-xs font-medium rounded-full border transition-all whitespace-nowrap min-h-[36px] ${
@@ -151,6 +156,19 @@ ${selectedOrderData.loyaltyPointsEarned > 0 ? `<div class="center" style="font-s
                 : "bg-white text-[#6B7280] border-[#E5E7EB] hover:bg-gray-50"
             }`}>{s.label}</button>
         ))}
+        <div className="ml-auto flex-shrink-0">
+          <input
+            type="date"
+            value={filterDate}
+            onChange={(e) => setFilterDate(e.target.value)}
+            className="px-3 py-2 text-xs border border-[#E5E7EB] rounded-full bg-white text-[#374151] min-h-[36px] focus:outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]/20"
+          />
+        </div>
+        {filterDate && (
+          <button onClick={() => setFilterDate("")} className="text-[10px] text-[#F97316] font-medium hover:underline whitespace-nowrap flex-shrink-0">
+            Reset Tanggal
+          </button>
+        )}
       </div>
 
       {/* Main Content */}
