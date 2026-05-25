@@ -13,7 +13,7 @@ export default function ProductsPage() {
   const [search, setSearch] = useState("");
 
   const [formData, setFormData] = useState({
-    name: "", price: "", category: "Makanan", image: "🍽️", barcode: "", stock: "0",
+    name: "", price: "", category: "Makanan", image: "🍽️", imageUrl: "", barcode: "", stock: "0",
   });
   const [variations, setVariations] = useState<ProductVariation[]>([]);
 
@@ -29,6 +29,7 @@ export default function ProductsPage() {
       id: editingProduct?.id || `product-${Date.now()}`,
       name: formData.name, price: parseInt(formData.price),
       category: formData.category, image: formData.image,
+      imageUrl: formData.imageUrl || undefined,
       barcode: formData.barcode || undefined, stock: parseInt(formData.stock),
       variations: variations.length > 0 ? variations : undefined,
     };
@@ -38,13 +39,13 @@ export default function ProductsPage() {
   };
 
   const resetForm = () => {
-    setFormData({ name: "", price: "", category: "Makanan", image: "🍽️", barcode: "", stock: "0" });
+    setFormData({ name: "", price: "", category: "Makanan", image: "🍽️", imageUrl: "", barcode: "", stock: "0" });
     setVariations([]); setEditingProduct(null); setShowForm(false);
   };
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
-    setFormData({ name: product.name, price: String(product.price), category: product.category, image: product.image, barcode: product.barcode || "", stock: String(product.stock) });
+    setFormData({ name: product.name, price: String(product.price), category: product.category, image: product.image, imageUrl: product.imageUrl || "", barcode: product.barcode || "", stock: String(product.stock) });
     setVariations(product.variations || []); setShowForm(true);
   };
 
@@ -88,9 +89,15 @@ export default function ProductsPage() {
         {filteredProducts.map((product) => (
           <div key={product.id} className="bento-card-hover group !p-3 sm:!p-4">
             <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary-50 border border-primary-100/40 flex items-center justify-center text-xl sm:text-2xl">
-                {product.image}
-              </div>
+              {product.imageUrl ? (
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden border border-primary-100/40 flex-shrink-0">
+                  <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary-50 border border-primary-100/40 flex items-center justify-center text-xl sm:text-2xl flex-shrink-0">
+                  {product.image}
+                </div>
+              )}
               <div className="flex gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                 <button onClick={() => handleEdit(product)}
                   className="p-2 rounded-lg hover:bg-primary-50 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center">
@@ -143,6 +150,29 @@ export default function ProductsPage() {
                       }`}>{emoji}</button>
                   ))}
                 </div>
+              </div>
+
+              {/* Image URL */}
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-text-secondary mb-1.5">Foto Produk (URL)</label>
+                <input className="input text-[16px] sm:text-sm" value={formData.imageUrl}
+                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                  placeholder="https://contoh.com/foto-produk.jpg" />
+                <p className="text-[10px] sm:text-xs text-text-muted mt-1">Paste URL gambar produk. Jika diisi, foto akan tampil menggantikan emoji.</p>
+                {formData.imageUrl && (
+                  <div className="mt-2 flex items-center gap-3">
+                    <div className="w-16 h-16 rounded-xl overflow-hidden border border-primary-100/60 flex-shrink-0">
+                      <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover"
+                        onError={(e) => { (e.target as HTMLImageElement).src = ""; (e.target as HTMLImageElement).alt = "Error"; }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-green-600 font-medium">Preview foto</p>
+                      <p className="text-[10px] text-text-muted truncate">{formData.imageUrl}</p>
+                      <button onClick={() => setFormData({ ...formData, imageUrl: "" })}
+                        className="text-[10px] text-red-500 hover:underline mt-1">Hapus foto</button>
+                    </div>
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-text-secondary mb-1.5">Nama Produk</label>

@@ -21,6 +21,7 @@ export interface Product {
   price: number;
   category: string;
   image: string;
+  imageUrl?: string;
   barcode?: string;
   variations?: ProductVariation[];
   ingredients?: { ingredientId: string; quantityUsed: number }[];

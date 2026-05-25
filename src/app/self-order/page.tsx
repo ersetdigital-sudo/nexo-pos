@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useStore, Product, CartItem } from "@/store";
 import { IconCart, IconPlus, IconX, IconCheck } from "@/components/Icons";
+import ProductImage from "@/components/ProductImage";
 
 export default function SelfOrderPage() {
   const { products, categories, addOrder, storeName } = useStore();
@@ -101,9 +102,7 @@ export default function SelfOrderPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {filteredProducts.map((product) => (
             <div key={product.id} className="bento-card !p-3 sm:!p-4 flex gap-3 items-center">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary-50 border border-primary-100/40 flex items-center justify-center text-xl sm:text-2xl flex-shrink-0">
-                {product.image}
-              </div>
+              <ProductImage product={product} size="md" />
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-xs sm:text-sm text-text truncate">{product.name}</h3>
                 <div className="font-bold text-primary-600 text-xs sm:text-sm">Rp {product.price.toLocaleString("id-ID")}</div>
@@ -152,7 +151,7 @@ export default function SelfOrderPage() {
                   {cart.map((item) => (
                     <div key={item.id} className="flex items-center justify-between p-2 sm:p-3 rounded-xl bg-primary-50 border border-primary-100/40">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-lg sm:text-xl flex-shrink-0">{item.product.image}</span>
+                        <ProductImage product={item.product} size="sm" className="!w-8 !h-8 !rounded-lg" />
                         <div className="min-w-0">
                           <p className="font-medium text-xs sm:text-sm text-text truncate">{item.product.name}</p>
                           <p className="text-xs text-text-muted">x{item.quantity}</p>

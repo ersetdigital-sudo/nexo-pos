@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useStore, Product, CartItem } from "@/store";
 import Link from "next/link";
 import { IconSearch, IconCart, IconPlus, IconMinus, IconTrash, IconX, IconChevronLeft, IconCash, IconQris, IconCard } from "@/components/Icons";
+import ProductImage from "@/components/ProductImage";
 
 export default function CashierPage() {
   const {
@@ -153,8 +154,8 @@ export default function CashierPage() {
             {filteredProducts.map((product) => (
               <button key={product.id} onClick={() => handleProductClick(product)}
                 className="bento-card-hover !p-3 sm:!p-4 text-left group">
-                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-primary-50 flex items-center justify-center text-lg sm:text-xl mb-2 sm:mb-3 group-hover:scale-105 transition-transform">
-                  {product.image}
+                <div className="mb-2 sm:mb-3 group-hover:scale-105 transition-transform">
+                  <ProductImage product={product} size="sm" />
                 </div>
                 <div className="font-medium text-xs sm:text-sm text-text leading-tight mb-1 line-clamp-2">{product.name}</div>
                 <div className="font-semibold text-xs sm:text-sm text-primary-700">Rp {product.price.toLocaleString("id-ID")}</div>
