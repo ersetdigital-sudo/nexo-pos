@@ -164,6 +164,93 @@ const sampleCustomers: Customer[] = [
   { id: "c3", name: "Ahmad Wijaya", phone: "08345678901", loyaltyPoints: 420, totalSpent: 840000, visitCount: 20 },
 ];
 
+// Dummy orders for demo
+const sampleOrders: Order[] = [
+  {
+    id: "order-demo-1", orderNumber: "250523-001",
+    items: [
+      { id: "ci1", product: sampleProducts[0], quantity: 2, subtotal: 50000, selectedVariations: [{ variationId: "v1", optionId: "o3" }] },
+      { id: "ci2", product: sampleProducts[4], quantity: 2, subtotal: 16000 },
+    ],
+    total: 73260, status: "completed", paymentMethod: "qris",
+    tableNumber: 3, customerName: "Budi Santoso", customerPhone: "08123456789",
+    loyaltyPointsEarned: 7, loyaltyPointsUsed: 0, createdAt: new Date(Date.now() - 3600000),
+  },
+  {
+    id: "order-demo-2", orderNumber: "250523-002",
+    items: [
+      { id: "ci3", product: sampleProducts[2], quantity: 1, subtotal: 22000, selectedVariations: [{ variationId: "v2", optionId: "o5" }] },
+      { id: "ci4", product: sampleProducts[5], quantity: 1, subtotal: 18000, selectedVariations: [{ variationId: "v3", optionId: "o9" }, { variationId: "v4", optionId: "o10" }] },
+      { id: "ci5", product: sampleProducts[3], quantity: 1, subtotal: 5000 },
+    ],
+    total: 49950, status: "completed", paymentMethod: "cash",
+    customerName: "Siti Rahayu", customerPhone: "08234567890",
+    loyaltyPointsEarned: 4, loyaltyPointsUsed: 0, createdAt: new Date(Date.now() - 7200000),
+  },
+  {
+    id: "order-demo-3", orderNumber: "250523-003",
+    items: [
+      { id: "ci6", product: sampleProducts[6], quantity: 1, subtotal: 30000 },
+      { id: "ci7", product: sampleProducts[7], quantity: 1, subtotal: 18000 },
+      { id: "ci8", product: sampleProducts[11], quantity: 2, subtotal: 30000 },
+    ],
+    total: 86580, status: "preparing", paymentMethod: "qris",
+    tableNumber: 6, customerName: "Ahmad Wijaya", customerPhone: "08345678901",
+    loyaltyPointsEarned: 8, loyaltyPointsUsed: 0, createdAt: new Date(Date.now() - 1800000),
+  },
+  {
+    id: "order-demo-4", orderNumber: "250523-004",
+    items: [
+      { id: "ci9", product: sampleProducts[5], quantity: 2, subtotal: 36000, selectedVariations: [{ variationId: "v3", optionId: "o8" }, { variationId: "v4", optionId: "o10" }] },
+      { id: "ci10", product: sampleProducts[8], quantity: 1, subtotal: 15000 },
+    ],
+    total: 56610, status: "ready", paymentMethod: "card",
+    tableNumber: 1, loyaltyPointsEarned: 5, loyaltyPointsUsed: 0, createdAt: new Date(Date.now() - 900000),
+  },
+  {
+    id: "order-demo-5", orderNumber: "250523-005",
+    items: [
+      { id: "ci11", product: sampleProducts[1], quantity: 2, subtotal: 40000 },
+      { id: "ci12", product: sampleProducts[10], quantity: 1, subtotal: 10000 },
+      { id: "ci13", product: sampleProducts[3], quantity: 2, subtotal: 10000 },
+    ],
+    total: 66600, status: "pending", paymentMethod: "cash",
+    tableNumber: 8, customerName: "Dewi Lestari",
+    loyaltyPointsEarned: 6, loyaltyPointsUsed: 0, createdAt: new Date(Date.now() - 300000),
+  },
+  {
+    id: "order-demo-6", orderNumber: "250523-006",
+    items: [
+      { id: "ci14", product: sampleProducts[9], quantity: 3, subtotal: 36000 },
+      { id: "ci15", product: sampleProducts[4], quantity: 3, subtotal: 24000 },
+    ],
+    total: 66600, status: "completed", paymentMethod: "qris",
+    customerName: "Rizky Pratama", customerPhone: "08456789012",
+    loyaltyPointsEarned: 6, loyaltyPointsUsed: 0, createdAt: new Date(Date.now() - 10800000),
+  },
+  {
+    id: "order-demo-7", orderNumber: "250523-007",
+    items: [
+      { id: "ci16", product: sampleProducts[0], quantity: 1, subtotal: 25000, selectedVariations: [{ variationId: "v1", optionId: "o4" }] },
+      { id: "ci17", product: sampleProducts[5], quantity: 1, subtotal: 23000, selectedVariations: [{ variationId: "v3", optionId: "o9" }, { variationId: "v4", optionId: "o11" }] },
+    ],
+    total: 53280, status: "completed", paymentMethod: "cash",
+    tableNumber: 5, customerName: "Fitri Handayani",
+    loyaltyPointsEarned: 5, loyaltyPointsUsed: 0, createdAt: new Date(Date.now() - 14400000),
+  },
+  {
+    id: "order-demo-8", orderNumber: "250523-008",
+    items: [
+      { id: "ci18", product: sampleProducts[2], quantity: 2, subtotal: 44000, selectedVariations: [{ variationId: "v2", optionId: "o7" }] },
+      { id: "ci19", product: sampleProducts[11], quantity: 2, subtotal: 30000 },
+      { id: "ci20", product: sampleProducts[9], quantity: 2, subtotal: 24000 },
+    ],
+    total: 108780, status: "cancelled", paymentMethod: "qris",
+    tableNumber: 10, customerName: "Joko Widodo",
+    loyaltyPointsEarned: 0, loyaltyPointsUsed: 0, createdAt: new Date(Date.now() - 18000000),
+  },
+];
+
 export const useStore = create<POSStore>()(persist((set, get) => ({
   // Products
   products: sampleProducts,
@@ -214,7 +301,7 @@ export const useStore = create<POSStore>()(persist((set, get) => ({
   clearCart: () => set({ cart: [] }),
 
   // Orders
-  orders: [],
+  orders: sampleOrders,
   addOrder: (order) => set((state) => ({ orders: [order, ...state.orders] })),
   updateOrderStatus: (orderId, status) => set((state) => ({
     orders: state.orders.map((o) =>
