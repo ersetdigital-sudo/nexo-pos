@@ -127,18 +127,18 @@ interface POSStore {
 
 // Sample data
 const sampleProducts: Product[] = [
-  { id: "1", name: "Nasi Goreng Spesial", price: 25000, category: "Makanan", image: "🍛", stock: 50, barcode: "8901234567890", variations: [{ id: "v1", name: "Level Pedas", options: [{ id: "o1", label: "Tidak Pedas", priceAdjustment: 0 }, { id: "o2", label: "Sedang", priceAdjustment: 0 }, { id: "o3", label: "Pedas", priceAdjustment: 2000 }, { id: "o4", label: "Extra Pedas", priceAdjustment: 3000 }] }] },
-  { id: "2", name: "Mie Ayam Bakso", price: 20000, category: "Makanan", image: "🍜", stock: 40, barcode: "8901234567891" },
-  { id: "3", name: "Ayam Geprek", price: 22000, category: "Makanan", image: "🍗", stock: 35, barcode: "8901234567892", variations: [{ id: "v2", name: "Sambal", options: [{ id: "o5", label: "Sambal Matah", priceAdjustment: 0 }, { id: "o6", label: "Sambal Bawang", priceAdjustment: 0 }, { id: "o7", label: "Sambal Ijo", priceAdjustment: 2000 }] }] },
-  { id: "4", name: "Es Teh Manis", price: 5000, category: "Minuman", image: "🧋", stock: 100, barcode: "8901234567893" },
-  { id: "5", name: "Es Jeruk Segar", price: 8000, category: "Minuman", image: "🍊", stock: 80, barcode: "8901234567894" },
-  { id: "6", name: "Kopi Susu Gula Aren", price: 18000, category: "Minuman", image: "☕", stock: 60, barcode: "8901234567895", variations: [{ id: "v3", name: "Ukuran", options: [{ id: "o8", label: "Regular", priceAdjustment: 0 }, { id: "o9", label: "Large", priceAdjustment: 5000 }] }, { id: "v4", name: "Suhu", options: [{ id: "o10", label: "Dingin", priceAdjustment: 0 }, { id: "o11", label: "Panas", priceAdjustment: 0 }] }] },
-  { id: "7", name: "Sate Ayam 10 Tusuk", price: 30000, category: "Makanan", image: "🍢", stock: 25, barcode: "8901234567896" },
-  { id: "8", name: "Gado-Gado", price: 18000, category: "Makanan", image: "🥗", stock: 30, barcode: "8901234567897" },
-  { id: "9", name: "Roti Bakar Coklat", price: 15000, category: "Snack", image: "🍞", stock: 45, barcode: "8901234567898" },
-  { id: "10", name: "Pisang Goreng Keju", price: 12000, category: "Snack", image: "🍌", stock: 50, barcode: "8901234567899" },
-  { id: "11", name: "Tahu Crispy", price: 10000, category: "Snack", image: "🧀", stock: 60, barcode: "8901234567900" },
-  { id: "12", name: "Jus Alpukat", price: 15000, category: "Minuman", image: "🥑", stock: 40, barcode: "8901234567901" },
+  { id: "1", name: "Nasi Goreng Spesial", price: 25000, category: "Makanan", image: "🍛", imageUrl: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=200&h=200&fit=crop", stock: 50, barcode: "8901234567890", variations: [{ id: "v1", name: "Level Pedas", options: [{ id: "o1", label: "Tidak Pedas", priceAdjustment: 0 }, { id: "o2", label: "Sedang", priceAdjustment: 0 }, { id: "o3", label: "Pedas", priceAdjustment: 2000 }, { id: "o4", label: "Extra Pedas", priceAdjustment: 3000 }] }] },
+  { id: "2", name: "Mie Ayam Bakso", price: 20000, category: "Makanan", image: "🍜", imageUrl: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=200&h=200&fit=crop", stock: 40, barcode: "8901234567891" },
+  { id: "3", name: "Ayam Geprek", price: 22000, category: "Makanan", image: "🍗", imageUrl: "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=200&h=200&fit=crop", stock: 35, barcode: "8901234567892", variations: [{ id: "v2", name: "Sambal", options: [{ id: "o5", label: "Sambal Matah", priceAdjustment: 0 }, { id: "o6", label: "Sambal Bawang", priceAdjustment: 0 }, { id: "o7", label: "Sambal Ijo", priceAdjustment: 2000 }] }] },
+  { id: "4", name: "Es Teh Manis", price: 5000, category: "Minuman", image: "🧋", imageUrl: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=200&h=200&fit=crop", stock: 100, barcode: "8901234567893" },
+  { id: "5", name: "Es Jeruk Segar", price: 8000, category: "Minuman", image: "🍊", imageUrl: "https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=200&h=200&fit=crop", stock: 80, barcode: "8901234567894" },
+  { id: "6", name: "Kopi Susu Gula Aren", price: 18000, category: "Minuman", image: "☕", imageUrl: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&h=200&fit=crop", stock: 60, barcode: "8901234567895", variations: [{ id: "v3", name: "Ukuran", options: [{ id: "o8", label: "Regular", priceAdjustment: 0 }, { id: "o9", label: "Large", priceAdjustment: 5000 }] }, { id: "v4", name: "Suhu", options: [{ id: "o10", label: "Dingin", priceAdjustment: 0 }, { id: "o11", label: "Panas", priceAdjustment: 0 }] }] },
+  { id: "7", name: "Sate Ayam 10 Tusuk", price: 30000, category: "Makanan", image: "🍢", imageUrl: "https://images.unsplash.com/photo-1529563021893-cc83c992d75d?w=200&h=200&fit=crop", stock: 25, barcode: "8901234567896" },
+  { id: "8", name: "Gado-Gado", price: 18000, category: "Makanan", image: "🥗", imageUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&h=200&fit=crop", stock: 30, barcode: "8901234567897" },
+  { id: "9", name: "Roti Bakar Coklat", price: 15000, category: "Snack", image: "🍞", imageUrl: "https://images.unsplash.com/photo-1619535860434-ba1d8fa12536?w=200&h=200&fit=crop", stock: 45, barcode: "8901234567898" },
+  { id: "10", name: "Pisang Goreng Keju", price: 12000, category: "Snack", image: "🍌", imageUrl: "https://images.unsplash.com/photo-1600335895229-6e75511892c8?w=200&h=200&fit=crop", stock: 50, barcode: "8901234567899" },
+  { id: "11", name: "Tahu Crispy", price: 10000, category: "Snack", image: "🧀", imageUrl: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=200&h=200&fit=crop", stock: 60, barcode: "8901234567900" },
+  { id: "12", name: "Jus Alpukat", price: 15000, category: "Minuman", image: "🥑", imageUrl: "https://images.unsplash.com/photo-1638176066666-ffb2f013c7dd?w=200&h=200&fit=crop", stock: 40, barcode: "8901234567901" },
 ];
 
 const sampleTables: Table[] = Array.from({ length: 12 }, (_, i) => ({
