@@ -11,6 +11,7 @@ export default function ProductsPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [filterCategory, setFilterCategory] = useState("Semua");
   const [search, setSearch] = useState("");
+  const [stockAdjust, setStockAdjust] = useState<{ id: string; value: string } | null>(null);
 
   const [formData, setFormData] = useState({
     name: "", price: "", category: "Makanan", image: "🍽️", imageUrl: "", barcode: "", stock: "0",
@@ -113,7 +114,28 @@ export default function ProductsPage() {
             <div className="font-bold text-primary-600 text-sm">Rp {product.price.toLocaleString("id-ID")}</div>
             <div className="flex items-center justify-between mt-3">
               <span className="badge-neutral text-xs">{product.category}</span>
-              <span className="text-xs text-text-muted">Stok: {product.stock}</span>
+              <div className="flex items-center gap-1.5">
+                {product.stock <= 5 && product.stock > 0 && (
+                  <span className="badge-warning text-[9px]">Low</span>
+                )}
+                {product.stock === 0 && (
+                  <span className="badge-danger text-[9px]">Habis</span>
+                )}
+                {stockAdjust?.id === product.id ? (
+                  <form onSubmit={(e) => { e.preventDefault(); const newStock = parseInt(stockAdjust.value); if (!isNaN(newStock) && newStock >= 0) { updateProduct(product.id, { stock: newStock }); } setStockAdjust(null); }}
+                    className="flex items-center gap-1">
+                    <input type="number" autoFocus className="w-14 px-1.5 py-0.5 text-xs border border-primary-200 rounded-md text-center focus:outline-none focus:ring-1 focus:ring-primary-300"
+                      value={stockAdjust.value} onChange={(e) => setStockAdjust({ ...stockAdjust, value: e.target.value })}
+                      onBlur={() => { const newStock = parseInt(stockAdjust.value); if (!isNaN(newStock) && newStock >= 0) { updateProduct(product.id, { stock: newStock }); } setStockAdjust(null); }}
+                      min="0" />
+                  </form>
+                ) : (
+                  <button onClick={() => setStockAdjust({ id: product.id, value: String(product.stock) })}
+                    className={`text-xs px-1.5 py-0.5 rounded-md transition-colors ${product.stock === 0 ? 'text-red-600 bg-red-50 hover:bg-red-100' : product.stock <= 5 ? 'text-amber-600 bg-amber-50 hover:bg-amber-100' : 'text-text-muted hover:bg-primary-50 hover:text-text'}`}>
+                    Stok: {product.stock}
+                  </button>
+                )}
+              </div>
             </div>
             {product.variations && product.variations.length > 0 && (
               <span className="badge-primary mt-2 text-[10px]">{product.variations.length} varian</span>

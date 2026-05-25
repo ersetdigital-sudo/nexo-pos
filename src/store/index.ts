@@ -303,7 +303,17 @@ export const useStore = create<POSStore>()(persist((set, get) => ({
 
   // Orders
   orders: sampleOrders,
-  addOrder: (order) => set((state) => ({ orders: [order, ...state.orders] })),
+  addOrder: (order) => set((state) => {
+    // Reduce stock for each item in the order
+    const updatedProducts = state.products.map((product) => {
+      const orderItem = order.items.find((item) => item.product.id === product.id);
+      if (orderItem) {
+        return { ...product, stock: Math.max(0, product.stock - orderItem.quantity) };
+      }
+      return product;
+    });
+    return { orders: [order, ...state.orders], products: updatedProducts };
+  }),
   updateOrderStatus: (orderId, status) => set((state) => ({
     orders: state.orders.map((o) =>
       o.id === orderId ? { ...o, status, ...(status === "completed" ? { completedAt: new Date() } : {}) } : o
