@@ -64,7 +64,7 @@ export default function DashboardPage() {
   return (
     <MainLayout title="Dashboard" subtitle="Ringkasan performa bisnis Anda hari ini">
       {/* Top stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-5 md:mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-5 md:mb-8">
         <StatCard
           index={0}
           label="Pendapatan"

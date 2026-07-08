@@ -79,17 +79,18 @@ export default function StatCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.05, ease: "easeOut" }}
       whileHover={{ y: -3 }}
-      className="bento-card !p-4 sm:!p-5 hover:shadow-bento-md hover:border-surface-400 h-full flex flex-col justify-between gap-3"
+      className="bento-card !p-4 sm:!p-5 hover:shadow-bento-md hover:border-surface-400 h-full flex flex-row items-center gap-4 sm:flex-col sm:items-stretch sm:justify-between sm:gap-3"
     >
-      <div className="flex items-center justify-between gap-2">
+      {/* Icon - left on mobile, top row on desktop */}
+      <div className="flex items-center justify-between gap-2 flex-shrink-0 sm:flex-shrink">
         <span
-          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl ${styles.iconBg} flex items-center justify-center flex-shrink-0 transition-transform duration-300`}
+          className={`w-12 h-12 rounded-2xl ${styles.iconBg} flex items-center justify-center flex-shrink-0 transition-transform duration-300`}
         >
-          <Icon className={`w-5 h-5 sm:w-[22px] sm:h-[22px] ${styles.iconColor}`} />
+          <Icon className={`w-[22px] h-[22px] ${styles.iconColor}`} />
         </span>
         {trend && (
           <span
-            className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full flex-shrink-0 ${
+            className={`hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full flex-shrink-0 ${
               trendUp ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
             }`}
           >
@@ -99,13 +100,27 @@ export default function StatCard({
         )}
       </div>
 
-      <div className="min-w-0">
-        <div className="text-2xl sm:text-[28px] font-extrabold text-text tracking-tight leading-none truncate tabular-nums">
+      {/* Value + label */}
+      <div className="min-w-0 flex-1">
+        <div className="text-[22px] sm:text-[28px] font-extrabold text-text tracking-tight leading-none truncate tabular-nums">
           <AnimatedValue value={value} format={format} />
         </div>
-        <p className="mt-1.5 text-xs font-medium text-text-secondary truncate">{label}</p>
-        <p className="text-[11px] text-text-muted truncate">{description}</p>
+        <p className="mt-1 sm:mt-1.5 text-xs font-medium text-text-secondary truncate">
+          {label} <span className="font-normal text-text-muted">· {description}</span>
+        </p>
       </div>
+
+      {/* Trend badge - right side on mobile only */}
+      {trend && (
+        <span
+          className={`sm:hidden inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full flex-shrink-0 ${
+            trendUp ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
+          }`}
+        >
+          {trendUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+          {trend}
+        </span>
+      )}
     </motion.div>
   );
 }
