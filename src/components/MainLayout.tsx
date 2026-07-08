@@ -10,9 +10,11 @@ import { LayoutDashboard, ShoppingBag, MonitorSmartphone, History, Settings } fr
 export default function MainLayout({
   children,
   title,
+  subtitle,
 }: {
   children: React.ReactNode;
   title: string;
+  subtitle?: string;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -38,7 +40,7 @@ export default function MainLayout({
       )}
 
       <div className="flex-1 flex flex-col min-w-0">
-        <Header title={title} onMenuToggle={() => setMobileMenuOpen(true)} />
+        <Header title={title} subtitle={subtitle} onMenuToggle={() => setMobileMenuOpen(true)} />
         <main className="flex-1 px-4 md:px-6 pt-1 pb-24 lg:pb-6 overflow-auto">
           {children}
         </main>

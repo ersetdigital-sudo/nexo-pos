@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @layer base {
   body {
@@ -25,16 +25,32 @@
 @layer components {
   /* Bento Cards - mobile-first, premium soft minimalism */
   .bento-card {
-    @apply bg-white rounded-xl sm:rounded-2xl border border-line shadow-bento p-4 sm:p-6 transition-all duration-200;
+    @apply bg-white rounded-xl sm:rounded-2xl border border-line shadow-bento p-4 sm:p-6 transition-all duration-300;
   }
   .bento-card-hover {
     @apply bento-card hover:shadow-bento-md hover:-translate-y-0.5 active:scale-[0.98];
   }
   .bento-card-lg {
-    @apply bg-white rounded-2xl border border-line shadow-bento-md p-4 sm:p-6 transition-all duration-200;
+    @apply bg-white rounded-2xl border border-line shadow-bento-md p-4 sm:p-6 transition-all duration-300;
   }
   .bento-card-accent {
-    @apply rounded-xl sm:rounded-2xl border border-primary-200/70 bg-primary-50 shadow-bento p-4 sm:p-6 transition-all duration-200;
+    @apply rounded-xl sm:rounded-2xl border border-primary-200/70 bg-primary-50 shadow-bento p-4 sm:p-6 transition-all duration-300;
+  }
+
+  /* Skeleton loading shimmer */
+  .skeleton {
+    @apply relative overflow-hidden rounded-lg bg-surface-300;
+  }
+  .skeleton::after {
+    content: "";
+    @apply absolute inset-0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+    animation: shimmer 1.6s infinite;
+  }
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
   }
 
   /* Buttons - min touch target 48px */
@@ -154,6 +170,28 @@ input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="month"]::-webkit-calendar-picker-indicator {
   opacity: 1 !important;
   filter: none !important;
+}
+
+/* Elegant ApexCharts tooltip */
+.apexcharts-tooltip {
+  border-radius: 14px !important;
+  border: 1px solid #ececec !important;
+  box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.12), 0 4px 12px -4px rgba(15, 23, 42, 0.06) !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(8px);
+  font-family: Inter, system-ui, sans-serif !important;
+}
+.apexcharts-tooltip-title {
+  background: transparent !important;
+  border-bottom: 1px solid #f1f3f6 !important;
+  font-weight: 600 !important;
+  color: #475569 !important;
+}
+.apexcharts-xaxistooltip {
+  border-radius: 10px !important;
+  border: 1px solid #ececec !important;
+  background: #ffffff !important;
+  box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.08) !important;
 }
 
 /* Scrollbar - only on desktop */

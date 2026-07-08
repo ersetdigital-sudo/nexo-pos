@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -64,7 +65,7 @@ export default function Sidebar({
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 space-y-1 overflow-y-auto scrollbar-hide">
+      <nav className="flex-1 px-3 space-y-1.5 overflow-y-auto scrollbar-hide">
         {menuItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -74,24 +75,35 @@ export default function Sidebar({
               href={item.href}
               onClick={onNavigate}
               title={collapsed ? item.label : undefined}
-              className={`flex items-center ${
+              className={`relative flex items-center ${
                 collapsed ? "justify-center px-0" : "gap-3 px-3"
-              } py-2 rounded-xl text-sm font-medium transition-all duration-200 min-h-[44px] group ${
+              } py-2 rounded-xl text-sm font-medium transition-colors duration-300 min-h-[44px] group ${
                 isActive
-                  ? "bg-primary-500 text-white shadow-bento-md"
+                  ? "text-white"
                   : "text-text-secondary hover:bg-surface-300 hover:text-text"
               }`}
             >
+              {isActive && (
+                <motion.span
+                  layoutId="sidebar-active-pill"
+                  className="absolute inset-0 rounded-xl bg-primary-500 shadow-bento-md"
+                  transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                />
+              )}
               <span
-                className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${
+                className={`relative z-10 w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
                   isActive
                     ? "bg-white/20"
-                    : "bg-surface-300 group-hover:bg-white"
+                    : "bg-surface-300 group-hover:bg-white group-hover:scale-105"
                 }`}
               >
-                <Icon className={`w-[18px] h-[18px] ${isActive ? "text-white" : "text-text-secondary"}`} />
+                <Icon
+                  className={`w-[18px] h-[18px] transition-colors duration-300 ${
+                    isActive ? "text-white" : "text-text-secondary group-hover:text-text"
+                  }`}
+                />
               </span>
-              {!collapsed && <span className="truncate">{item.label}</span>}
+              {!collapsed && <span className="relative z-10 truncate">{item.label}</span>}
             </Link>
           );
         })}

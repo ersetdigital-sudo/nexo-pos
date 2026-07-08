@@ -37,39 +37,61 @@ export default function DashboardPage() {
   );
   const avgOrder = completedToday.length > 0 ? todayRevenue / completedToday.length : 0;
 
+  // Yesterday comparison for trend indicators
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toDateString();
+  const yesterdayOrders = orders.filter(
+    (o) => new Date(o.createdAt).toDateString() === yesterdayStr
+  );
+  const yesterdayRevenue = yesterdayOrders
+    .filter((o) => o.status === "completed")
+    .reduce((sum, o) => sum + o.total, 0);
+
+  const pctTrend = (today: number, prev: number) => {
+    if (prev === 0) return today > 0 ? "+100%" : undefined;
+    const pct = ((today - prev) / prev) * 100;
+    return `${pct >= 0 ? "+" : ""}${Math.round(pct)}%`;
+  };
+  const revenueTrend = pctTrend(todayRevenue, yesterdayRevenue);
+  const ordersTrend = pctTrend(todayOrders.length, yesterdayOrders.length);
+
   const formatRupiah = (n: number) =>
     n >= 1000000
       ? `Rp ${(n / 1000000).toLocaleString("id-ID", { maximumFractionDigits: 1 })}jt`
       : `Rp ${n.toLocaleString("id-ID")}`;
 
   return (
-    <MainLayout title="Dashboard">
+    <MainLayout title="Dashboard" subtitle="Ringkasan performa bisnis Anda hari ini">
       {/* Top stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 md:gap-4 mb-4 md:mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 md:gap-4 mb-5 md:mb-8">
         <div className="col-span-2 md:col-span-1">
           <StatCard
             index={0}
             label="Pendapatan"
-            value={formatRupiah(todayRevenue)}
+            value={todayRevenue}
+            format={formatRupiah}
             description="hari ini"
             icon={Wallet}
             tone="orange"
-            trend={completedToday.length > 0 ? `${completedToday.length} trx` : undefined}
-            trendUp
+            trend={revenueTrend}
+            trendUp={todayRevenue >= yesterdayRevenue}
           />
         </div>
         <StatCard
           index={1}
           label="Pesanan"
-          value={`${todayOrders.length}`}
+          value={todayOrders.length}
           description={`${activeOrders.length} aktif`}
           icon={ShoppingBag}
           tone="neutral"
+          trend={ordersTrend}
+          trendUp={todayOrders.length >= yesterdayOrders.length}
         />
         <StatCard
           index={2}
           label="Member"
-          value={`${customers.length}`}
+          value={customers.length}
           description="terdaftar"
           icon={Users}
           tone="green"
@@ -77,7 +99,7 @@ export default function DashboardPage() {
         <StatCard
           index={3}
           label="Produk"
-          value={`${products.length}`}
+          value={products.length}
           description="item aktif"
           icon={Package}
           tone="neutral"
@@ -93,7 +115,7 @@ export default function DashboardPage() {
         <StatCard
           index={5}
           label="Antrian"
-          value={`${queueOrders.length}`}
+          value={queueOrders.length}
           description="menunggu"
           icon={Clock}
           tone={queueOrders.length > 0 ? "red" : "neutral"}

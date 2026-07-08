@@ -3,7 +3,15 @@
 import Link from "next/link";
 import { Bell, Search, Menu, Plus, Wifi } from "lucide-react";
 
-export default function Header({ title, onMenuToggle }: { title: string; onMenuToggle?: () => void }) {
+export default function Header({
+  title,
+  subtitle,
+  onMenuToggle,
+}: {
+  title: string;
+  subtitle?: string;
+  onMenuToggle?: () => void;
+}) {
   const today = new Date().toLocaleDateString("id-ID", {
     weekday: "long",
     day: "numeric",
@@ -12,8 +20,8 @@ export default function Header({ title, onMenuToggle }: { title: string; onMenuT
   });
 
   return (
-    <header className="sticky top-0 z-20 bg-surface-200/80 backdrop-blur-xl">
-      <div className="flex items-center justify-between gap-2 px-4 md:px-6 h-16">
+    <header className="sticky top-0 z-20 bg-surface-200/80 backdrop-blur-xl border-b border-line/60">
+      <div className="flex items-center justify-between gap-3 px-4 md:px-6 h-[68px]">
         <div className="flex items-center gap-2 min-w-0">
           {/* Mobile menu button */}
           <button
@@ -24,8 +32,12 @@ export default function Header({ title, onMenuToggle }: { title: string; onMenuT
             <Menu className="w-5 h-5 text-text-secondary" />
           </button>
           <div className="min-w-0">
-            <h2 className="text-base md:text-lg font-bold text-text truncate leading-tight">{title}</h2>
-            <p className="text-[11px] text-text-muted truncate hidden sm:block">{today}</p>
+            <h2 className="text-base md:text-lg font-bold text-text truncate leading-tight tracking-tight">
+              {title}
+            </h2>
+            <p className="text-[11px] text-text-muted truncate hidden sm:block">
+              {subtitle ?? today}
+            </p>
           </div>
         </div>
 

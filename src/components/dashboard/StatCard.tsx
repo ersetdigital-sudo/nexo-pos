@@ -1,7 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { MoreHorizontal, TrendingDown, TrendingUp } from "lucide-react";
+import { useEffect, useState } from "react";
+import { animate, motion, useReducedMotion } from "framer-motion";
+import { TrendingDown, TrendingUp } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export type StatTone = "orange" | "green" | "neutral" | "red";
@@ -13,9 +14,46 @@ const toneStyles: Record<StatTone, { iconBg: string; iconColor: string }> = {
   red: { iconBg: "bg-danger/10", iconColor: "text-danger" },
 };
 
+function AnimatedValue({
+  value,
+  format,
+}: {
+  value: string | number;
+  format?: (n: number) => string;
+}) {
+  const reducedMotion = useReducedMotion();
+  const isNumeric = typeof value === "number";
+  const [display, setDisplay] = useState(() =>
+    isNumeric ? (format ? format(0) : "0") : String(value)
+  );
+
+  useEffect(() => {
+    if (!isNumeric) {
+      setDisplay(String(value));
+      return;
+    }
+    if (reducedMotion) {
+      setDisplay(format ? format(value) : Math.round(value).toLocaleString("id-ID"));
+      return;
+    }
+    const controls = animate(0, value, {
+      duration: 0.9,
+      ease: "easeOut",
+      onUpdate: (v) => {
+        const rounded = Math.round(v);
+        setDisplay(format ? format(rounded) : rounded.toLocaleString("id-ID"));
+      },
+    });
+    return () => controls.stop();
+  }, [value, isNumeric, format, reducedMotion]);
+
+  return <>{display}</>;
+}
+
 export default function StatCard({
   label,
   value,
+  format,
   description,
   icon: Icon,
   tone = "neutral",
@@ -24,7 +62,8 @@ export default function StatCard({
   index = 0,
 }: {
   label: string;
-  value: string;
+  value: string | number;
+  format?: (n: number) => string;
   description: string;
   icon: LucideIcon;
   tone?: StatTone;
@@ -40,29 +79,17 @@ export default function StatCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.05, ease: "easeOut" }}
       whileHover={{ y: -3 }}
-      className="bento-card hover:shadow-bento-md"
+      className="bento-card !p-4 sm:!p-5 hover:shadow-bento-md hover:border-surface-400 h-full flex flex-col justify-between gap-3"
     >
-      <div className="flex items-start justify-between mb-3 sm:mb-4">
-        <span className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full ${styles.iconBg} flex items-center justify-center`}>
-          <Icon className={`w-[18px] h-[18px] sm:w-5 sm:h-5 ${styles.iconColor}`} />
-        </span>
-        <button
-          className="p-1.5 -m-1 rounded-lg text-text-muted hover:bg-surface-300 hover:text-text transition-colors"
-          aria-label={`Menu ${label}`}
+      <div className="flex items-center justify-between gap-2">
+        <span
+          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl ${styles.iconBg} flex items-center justify-center flex-shrink-0 transition-transform duration-300`}
         >
-          <MoreHorizontal className="w-4 h-4" />
-        </button>
-      </div>
-
-      <div className="text-xl sm:text-3xl font-bold text-text tracking-tight leading-none truncate">
-        {value}
-      </div>
-
-      <div className="mt-2 flex items-center gap-2 flex-wrap">
-        <span className="text-[13px] font-medium text-text-secondary">{label}</span>
+          <Icon className={`w-5 h-5 sm:w-[22px] sm:h-[22px] ${styles.iconColor}`} />
+        </span>
         {trend && (
           <span
-            className={`inline-flex items-center gap-0.5 text-[11px] font-semibold px-1.5 py-0.5 rounded-full ${
+            className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full flex-shrink-0 ${
               trendUp ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
             }`}
           >
@@ -71,7 +98,14 @@ export default function StatCard({
           </span>
         )}
       </div>
-      <p className="text-xs text-text-muted mt-0.5">{description}</p>
+
+      <div className="min-w-0">
+        <div className="text-2xl sm:text-[28px] font-extrabold text-text tracking-tight leading-none truncate tabular-nums">
+          <AnimatedValue value={value} format={format} />
+        </div>
+        <p className="mt-1.5 text-xs font-medium text-text-secondary truncate">{label}</p>
+        <p className="text-[11px] text-text-muted truncate">{description}</p>
+      </div>
     </motion.div>
   );
 }
