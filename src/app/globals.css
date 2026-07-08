@@ -23,33 +23,33 @@
 }
 
 @layer components {
-  /* Bento Cards - mobile-first */
+  /* Bento Cards - mobile-first, premium soft minimalism */
   .bento-card {
-    @apply bg-white rounded-xl border border-primary-100/60 shadow-bento p-3 sm:p-4 transition-all duration-200;
+    @apply bg-white rounded-xl sm:rounded-2xl border border-line shadow-bento p-4 sm:p-6 transition-all duration-200;
   }
   .bento-card-hover {
     @apply bento-card hover:shadow-bento-md hover:-translate-y-0.5 active:scale-[0.98];
   }
   .bento-card-lg {
-    @apply bg-white rounded-2xl border border-primary-100/60 shadow-bento-md p-4 sm:p-6;
+    @apply bg-white rounded-2xl border border-line shadow-bento-md p-4 sm:p-6 transition-all duration-200;
   }
   .bento-card-accent {
-    @apply rounded-xl border border-primary-200 bg-primary-50 shadow-bento p-3 sm:p-4;
+    @apply rounded-xl sm:rounded-2xl border border-primary-200/70 bg-primary-50 shadow-bento p-4 sm:p-6 transition-all duration-200;
   }
 
-  /* Buttons - min touch target 44px */
+  /* Buttons - min touch target 48px */
   .btn {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium
-           rounded-lg transition-all duration-200 cursor-pointer select-none
+           rounded-xl transition-all duration-200 cursor-pointer select-none
            focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.97]
-           min-h-[44px];
+           min-h-[48px];
   }
   .btn-primary {
-    @apply btn bg-primary-200 text-primary-800 hover:bg-primary-300 
+    @apply btn bg-primary-500 text-white hover:bg-primary-600
            focus:ring-primary-300 shadow-bento;
   }
   .btn-secondary {
-    @apply btn bg-secondary-300 text-white hover:bg-secondary-400
+    @apply btn bg-secondary-700 text-white hover:bg-secondary-800
            focus:ring-secondary-300 shadow-bento;
   }
   .btn-success {
@@ -61,25 +61,25 @@
            focus:ring-red-400 shadow-bento;
   }
   .btn-ghost {
-    @apply btn bg-transparent text-text-secondary hover:bg-primary-50
+    @apply btn bg-transparent text-text-secondary hover:bg-surface-300
            focus:ring-primary-200;
   }
   .btn-outline {
-    @apply btn border border-primary-200 bg-white text-text hover:bg-primary-50
+    @apply btn border border-line bg-white text-text hover:bg-surface-200
            focus:ring-primary-200;
   }
 
   /* Inputs - 16px prevents iOS zoom */
   .input {
-    @apply w-full px-4 py-2.5 text-[16px] sm:text-sm bg-white border border-primary-100 rounded-lg
+    @apply w-full px-4 py-2.5 text-[16px] sm:text-sm bg-white border border-line rounded-xl
            font-medium transition-all duration-200 min-h-[44px]
-           focus:outline-none focus:ring-2 focus:ring-primary-200/50 focus:border-primary-200
+           focus:outline-none focus:ring-2 focus:ring-primary-200/50 focus:border-primary-300
            placeholder:text-text-muted;
   }
 
   /* Badges */
   .badge {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-md whitespace-nowrap;
+    @apply inline-flex items-center gap-1 px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full whitespace-nowrap;
   }
   .badge-primary {
     @apply badge bg-primary-100 text-primary-800;
@@ -166,10 +166,10 @@ input[type="month"]::-webkit-calendar-picker-indicator {
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #E5D5C5;
+    background: #E2E5EA;
     border-radius: 999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #D4C0AC;
+    background: #CBD1D9;
   }
 }

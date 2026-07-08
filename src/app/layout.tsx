@@ -17,11 +17,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
+    <html lang="id" className="bg-surface-200">
       <head>
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/icon.svg" />
-        <meta name="theme-color" content="#FFF5E6" />
+        <meta name="theme-color" content="#F8F9FB" />
       </head>
       <body className="min-h-screen">
         <StoreInitializer>

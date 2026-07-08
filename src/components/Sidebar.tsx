@@ -3,47 +3,68 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  IconDashboard, IconCashier, IconCustomerDisplay, IconQueue,
-  IconKitchen, IconProducts, IconTable, IconSelfOrder,
-  IconLoyalty, IconIngredients, IconOrders, IconSettings, IconTrendUp,
-} from "./Icons";
+  LayoutDashboard,
+  ShoppingBag,
+  MonitorSmartphone,
+  Package,
+  QrCode,
+  Smartphone,
+  ChartNoAxesCombined,
+  Award,
+  Boxes,
+  History,
+  Settings,
+  Zap,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 
 const menuItems = [
-  { href: "/", label: "Dashboard", icon: IconDashboard },
-  { href: "/cashier", label: "Kasir", icon: IconCashier },
-  { href: "/display", label: "Display", icon: IconCustomerDisplay },
-  { href: "/products", label: "Produk", icon: IconProducts },
-  { href: "/tables", label: "Meja & QR", icon: IconTable },
-  { href: "/self-order", label: "Self Order", icon: IconSelfOrder },
-  { href: "/analytics", label: "Analitik", icon: IconTrendUp },
-  { href: "/loyalty", label: "Loyalty", icon: IconLoyalty },
-  { href: "/ingredients", label: "Stok Bahan", icon: IconIngredients },
-  { href: "/orders", label: "Riwayat", icon: IconOrders },
-  { href: "/settings", label: "Pengaturan", icon: IconSettings },
+  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/cashier", label: "Kasir", icon: ShoppingBag },
+  { href: "/display", label: "Display", icon: MonitorSmartphone },
+  { href: "/products", label: "Produk", icon: Package },
+  { href: "/tables", label: "Meja & QR", icon: QrCode },
+  { href: "/self-order", label: "Self Order", icon: Smartphone },
+  { href: "/analytics", label: "Analitik", icon: ChartNoAxesCombined },
+  { href: "/loyalty", label: "Loyalty", icon: Award },
+  { href: "/ingredients", label: "Stok Bahan", icon: Boxes },
+  { href: "/orders", label: "Riwayat", icon: History },
+  { href: "/settings", label: "Pengaturan", icon: Settings },
 ];
 
-export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
+export default function Sidebar({
+  onNavigate,
+  collapsed = false,
+  onToggleCollapse,
+}: {
+  onNavigate?: () => void;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
+}) {
   const pathname = usePathname();
 
   return (
-    <aside className="w-[250px] min-h-screen bg-white border-r border-primary-100/80 flex flex-col">
+    <aside
+      className={`${
+        collapsed ? "w-[84px]" : "w-[260px]"
+      } h-full flex flex-col rounded-2xl bg-white border border-line shadow-float transition-all duration-200 overflow-hidden`}
+    >
       {/* Logo */}
-      <div className="p-5 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-primary-200 rounded-lg flex items-center justify-center">
-            <svg className="w-5 h-5 text-primary-800" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </div>
-          <div>
-            <h1 className="text-base font-bold text-text">Nexo POS</h1>
-            <p className="text-xs text-text-muted">Kasir Digital</p>
-          </div>
+      <div className={`p-5 pb-4 flex items-center ${collapsed ? "justify-center" : "gap-3"}`}>
+        <div className="w-10 h-10 rounded-xl bg-primary-500 flex items-center justify-center flex-shrink-0 shadow-bento">
+          <Zap className="w-5 h-5 text-white" fill="currentColor" strokeWidth={0} />
         </div>
+        {!collapsed && (
+          <div className="min-w-0">
+            <h1 className="text-base font-bold text-text leading-tight truncate">Nexo POS</h1>
+            <p className="text-xs text-text-muted truncate">Kasir Digital</p>
+          </div>
+        )}
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 px-3 space-y-1 overflow-y-auto scrollbar-hide">
         {menuItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -52,25 +73,45 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
               key={item.href}
               href={item.href}
               onClick={onNavigate}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 min-h-[44px] ${
+              title={collapsed ? item.label : undefined}
+              className={`flex items-center ${
+                collapsed ? "justify-center px-0" : "gap-3 px-3"
+              } py-2 rounded-xl text-sm font-medium transition-all duration-200 min-h-[44px] group ${
                 isActive
-                  ? "bg-primary-100/80 text-primary-800"
-                  : "text-text-secondary hover:bg-surface-200 hover:text-text"
+                  ? "bg-primary-500 text-white shadow-bento-md"
+                  : "text-text-secondary hover:bg-surface-300 hover:text-text"
               }`}
             >
-              <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${isActive ? "text-primary-600" : "text-text-muted"}`} />
-              <span>{item.label}</span>
+              <span
+                className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${
+                  isActive
+                    ? "bg-white/20"
+                    : "bg-surface-300 group-hover:bg-white"
+                }`}
+              >
+                <Icon className={`w-[18px] h-[18px] ${isActive ? "text-white" : "text-text-secondary"}`} />
+              </span>
+              {!collapsed && <span className="truncate">{item.label}</span>}
             </Link>
           );
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 m-3 rounded-lg bg-surface-200 border border-primary-100/40">
-        <p className="text-xs text-text-muted text-center">
-          Nexo POS v1.0
-        </p>
-      </div>
+      {/* Collapse toggle (desktop only) */}
+      {onToggleCollapse && (
+        <div className="p-3 pt-2">
+          <button
+            onClick={onToggleCollapse}
+            className={`w-full flex items-center ${
+              collapsed ? "justify-center" : "justify-between px-3"
+            } py-2.5 rounded-xl text-xs font-medium text-text-muted hover:bg-surface-300 hover:text-text transition-colors min-h-[44px]`}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {!collapsed && <span>Ciutkan</span>}
+            {collapsed ? <ChevronsRight className="w-4 h-4" /> : <ChevronsLeft className="w-4 h-4" />}
+          </button>
+        </div>
+      )}
     </aside>
   );
 }
