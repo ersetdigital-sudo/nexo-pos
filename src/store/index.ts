@@ -136,7 +136,31 @@ interface POSStore {
   storePhone: string;
   taxRate: number;
   loyaltyPointsPerAmount: number;
-  setSettings: (settings: Partial<{ storeName: string; storePhone: string; taxRate: number; loyaltyPointsPerAmount: number }>) => void;
+  // WhatsApp
+  waToken: string;
+  waSenderNumber: string;
+  waTemplate: string;
+  waAutoSend: boolean;
+  // Printer
+  printerType: string;
+  printerPaperWidth: string;
+  printerName: string;
+  // Payment
+  paymentMerchantId: string;
+  paymentApiKey: string;
+  paymentProvider: string;
+  paymentAutoQris: boolean;
+  // Barcode
+  barcodeFormat: string;
+  barcodeLabelSize: string;
+  barcodeShowPrice: boolean;
+  // Scanner
+  scannerType: string;
+  scannerAutoAdd: boolean;
+  scannerSound: boolean;
+  // Settings action
+  setSettings: (settings: Record<string, unknown>) => void;
+  sendWhatsAppReceipt: (data: { phone: string; orderNumber: string; customerName: string; items: { name: string; quantity: number; subtotal: number }[]; total: number; pointsEarned: number }) => Promise<{ success: boolean; error?: string }>;
 }
 
 export const useStore = create<POSStore>()((set, get) => ({
@@ -167,6 +191,23 @@ export const useStore = create<POSStore>()((set, get) => ({
         storePhone: settings.storePhone,
         taxRate: settings.taxRate,
         loyaltyPointsPerAmount: settings.loyaltyPointsPerAmount,
+        waToken: settings.waToken || "",
+        waSenderNumber: settings.waSenderNumber || "",
+        waTemplate: settings.waTemplate || "",
+        waAutoSend: settings.waAutoSend || false,
+        printerType: settings.printerType || "bluetooth",
+        printerPaperWidth: settings.printerPaperWidth || "58mm",
+        printerName: settings.printerName || "",
+        paymentMerchantId: settings.paymentMerchantId || "",
+        paymentApiKey: settings.paymentApiKey || "",
+        paymentProvider: settings.paymentProvider || "midtrans",
+        paymentAutoQris: settings.paymentAutoQris || false,
+        barcodeFormat: settings.barcodeFormat || "EAN-13",
+        barcodeLabelSize: settings.barcodeLabelSize || "30mm x 20mm",
+        barcodeShowPrice: settings.barcodeShowPrice !== false,
+        scannerType: settings.scannerType || "usb",
+        scannerAutoAdd: settings.scannerAutoAdd !== false,
+        scannerSound: settings.scannerSound !== false,
         isLoading: false,
         isInitialized: true,
       });
@@ -310,9 +351,36 @@ export const useStore = create<POSStore>()((set, get) => ({
   storePhone: "08123456789",
   taxRate: 0.11,
   loyaltyPointsPerAmount: 10000,
+  waToken: "",
+  waSenderNumber: "",
+  waTemplate: "Halo {nama}!\n\nTerima kasih sudah berbelanja di {toko}.\n\nStruk #{nomor_order}\n{detail_pesanan}\n\nTotal: Rp {total}\nPoin didapat: {poin}\n\nSampai jumpa lagi!",
+  waAutoSend: false,
+  printerType: "bluetooth",
+  printerPaperWidth: "58mm",
+  printerName: "",
+  paymentMerchantId: "",
+  paymentApiKey: "",
+  paymentProvider: "midtrans",
+  paymentAutoQris: false,
+  barcodeFormat: "EAN-13",
+  barcodeLabelSize: "30mm x 20mm",
+  barcodeShowPrice: true,
+  scannerType: "usb",
+  scannerAutoAdd: true,
+  scannerSound: true,
 
   setSettings: (settings) => {
     set((state) => ({ ...state, ...settings }));
     api("/api/settings", { method: "PUT", body: JSON.stringify(settings) }).catch(console.error);
+  },
+
+  sendWhatsAppReceipt: async (data) => {
+    try {
+      const result = await api("/api/whatsapp/send", { method: "POST", body: JSON.stringify(data) });
+      return { success: true };
+    } catch (error) {
+      console.error("Failed to send WA receipt:", error);
+      return { success: false, error: String(error) };
+    }
   },
 }));
