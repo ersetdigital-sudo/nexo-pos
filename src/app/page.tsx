@@ -11,7 +11,7 @@ import {
   PopularProductsPanel,
   TodaySummaryPanel,
 } from "@/components/dashboard/SidePanels";
-import { Wallet, ShoppingBag, Users, Package, Utensils, Clock } from "lucide-react";
+import { Wallet, ShoppingBag, Utensils, Clock } from "lucide-react";
 
 export default function DashboardPage() {
   const { orders, products, customers, tables, ingredientStock } = useStore();
@@ -64,20 +64,18 @@ export default function DashboardPage() {
   return (
     <MainLayout title="Dashboard" subtitle="Ringkasan performa bisnis Anda hari ini">
       {/* Top stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 md:gap-4 mb-5 md:mb-8">
-        <div className="col-span-2 md:col-span-1">
-          <StatCard
-            index={0}
-            label="Pendapatan"
-            value={todayRevenue}
-            format={formatRupiah}
-            description="hari ini"
-            icon={Wallet}
-            tone="orange"
-            trend={revenueTrend}
-            trendUp={todayRevenue >= yesterdayRevenue}
-          />
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-5 md:mb-8">
+        <StatCard
+          index={0}
+          label="Pendapatan"
+          value={todayRevenue}
+          format={formatRupiah}
+          description="hari ini"
+          icon={Wallet}
+          tone="orange"
+          trend={revenueTrend}
+          trendUp={todayRevenue >= yesterdayRevenue}
+        />
         <StatCard
           index={1}
           label="Pesanan"
@@ -90,22 +88,6 @@ export default function DashboardPage() {
         />
         <StatCard
           index={2}
-          label="Member"
-          value={customers.length}
-          description="terdaftar"
-          icon={Users}
-          tone="green"
-        />
-        <StatCard
-          index={3}
-          label="Produk"
-          value={products.length}
-          description="item aktif"
-          icon={Package}
-          tone="neutral"
-        />
-        <StatCard
-          index={4}
           label="Meja"
           value={`${occupiedTables.length}/${tables.length}`}
           description="terisi"
@@ -113,7 +95,7 @@ export default function DashboardPage() {
           tone="orange"
         />
         <StatCard
-          index={5}
+          index={3}
           label="Antrian"
           value={queueOrders.length}
           description="menunggu"
