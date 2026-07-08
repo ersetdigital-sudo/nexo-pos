@@ -149,13 +149,16 @@ export default function RevenueChart({ orders }: { orders: Order[] }) {
         </span>
       </div>
 
-      {/* Summary row */}
-      <div className="grid grid-cols-3 gap-3 mb-2 rounded-xl bg-surface-100 border border-line/70 divide-x divide-line/70">
+      {/* Summary - stacked on mobile, 3 columns on larger screens */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 mb-2 rounded-xl bg-surface-100 border border-line/70 divide-y sm:divide-y-0 sm:divide-x divide-line/70">
         {summaryItems.map((item) => (
-          <div key={item.label} className="px-3 sm:px-4 py-3 min-w-0">
-            <p className="text-[11px] text-text-muted truncate">{item.label}</p>
+          <div
+            key={item.label}
+            className="flex items-center justify-between sm:block px-4 py-3 min-w-0 gap-3"
+          >
+            <p className="text-xs sm:text-[11px] text-text-muted truncate">{item.label}</p>
             <p
-              className={`mt-0.5 text-sm sm:text-lg font-bold tracking-tight truncate tabular-nums ${
+              className={`sm:mt-0.5 text-sm sm:text-lg font-bold tracking-tight truncate tabular-nums flex-shrink-0 ${
                 item.accent ? (growthUp ? "text-success" : "text-danger") : "text-text"
               }`}
             >
