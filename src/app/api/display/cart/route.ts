@@ -14,17 +14,23 @@ export async function POST(request: NextRequest) {
     // Insert new cart items
     if (cart && cart.length > 0) {
       for (const item of cart) {
+        // Support both nested (item.product.id) and flat (item.product_id) formats
+        const productId = item.product?.id || item.product_id || "unknown";
+        const productName = item.product?.name || item.product_name || "Unknown";
+        const productPrice = item.product?.price || item.product_price || 0;
+        const productImage = item.product?.image || item.product_image || "";
+
         await pool.query<ResultSetHeader>(
           `INSERT INTO display_cart (id, product_id, product_name, product_price, product_image, quantity, subtotal, selected_variations, added_at) 
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
           [
-            item.id,
-            item.product.id,
-            item.product.name,
-            item.product.price,
-            item.product.image || "",
-            item.quantity,
-            item.subtotal,
+            item.id || `item-${Date.now()}`,
+            productId,
+            productName,
+            productPrice,
+            productImage,
+            item.quantity || 1,
+            item.subtotal || productPrice,
             item.selectedVariations ? JSON.stringify(item.selectedVariations) : null,
           ]
         );
@@ -32,9 +38,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("POST /api/display/cart error:", error);
-    return NextResponse.json({ error: "Failed to update display cart" }, { status: 500 });
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error("POST /api/display/cart error:", errMsg);
+    return NextResponse.json({ error: "Failed to update display cart", detail: errMsg }, { status: 500 });
   }
 }
 
@@ -43,8 +50,9 @@ export async function DELETE() {
   try {
     await pool.query<ResultSetHeader>("DELETE FROM display_cart");
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("DELETE /api/display/cart error:", error);
-    return NextResponse.json({ error: "Failed to clear display cart" }, { status: 500 });
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error("DELETE /api/display/cart error:", errMsg);
+    return NextResponse.json({ error: "Failed to clear display cart", detail: errMsg }, { status: 500 });
   }
 }
