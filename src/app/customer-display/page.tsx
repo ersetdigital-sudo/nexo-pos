@@ -1,8 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { CartItem } from "@/store";
+import { useState, useEffect, useRef } from "react";
 import { IconCart, IconLoyalty, IconCash, IconQris, IconCard } from "@/components/Icons";
+
+interface CartItem {
+  id: string;
+  product: { id: string; name: string; price: number; image: string };
+  quantity: number;
+  subtotal: number;
+  selectedVariations?: { variationId: string; optionId: string }[];
+}
 
 interface DisplayData {
   cart: CartItem[];
@@ -12,76 +19,45 @@ interface DisplayData {
     orderNumber: string;
     total: number;
     status: string;
-  };
+  } | null;
 }
 
 export default function CustomerDisplayPage() {
   const [data, setData] = useState<DisplayData>({
     cart: [],
-    storeName: "Nexo POS",
+    storeName: "Dapur Bunda",
     taxRate: 0.11,
+    lastOrder: null,
   });
   const [connected, setConnected] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Poll API every 3 seconds for real-time updates
   useEffect(() => {
-    // Listen for BroadcastChannel messages (same device, cross-tab)
-    const channel = new BroadcastChannel("nexo-pos-display");
-
-    channel.onmessage = (event) => {
-      if (event.data.type === "CART_UPDATE") {
-        setData((prev) => ({ ...prev, cart: event.data.cart }));
-        setConnected(true);
-      }
-      if (event.data.type === "ORDER_CREATED") {
-        setData((prev) => ({
-          ...prev,
-          cart: [],
-          lastOrder: event.data.order,
-        }));
-      }
-      if (event.data.type === "STORE_INFO") {
-        setData((prev) => ({
-          ...prev,
-          storeName: event.data.storeName,
-          taxRate: event.data.taxRate,
-        }));
-      }
-    };
-
-    // Also listen to localStorage changes (cross-tab fallback)
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === "nexo-display-cart" && e.newValue) {
-        try {
-          const parsed = JSON.parse(e.newValue);
-          setData((prev) => ({ ...prev, cart: parsed }));
-          setConnected(true);
-        } catch {}
-      }
-      if (e.key === "nexo-display-order" && e.newValue) {
-        try {
-          const parsed = JSON.parse(e.newValue);
-          setData((prev) => ({ ...prev, cart: [], lastOrder: parsed }));
-        } catch {}
-      }
-    };
-
-    window.addEventListener("storage", handleStorage);
-
-    // Request initial data
-    channel.postMessage({ type: "REQUEST_DATA" });
-
-    // Check for existing localStorage data
-    const existingCart = localStorage.getItem("nexo-display-cart");
-    if (existingCart) {
+    const fetchDisplay = async () => {
       try {
-        setData((prev) => ({ ...prev, cart: JSON.parse(existingCart) }));
-        setConnected(true);
-      } catch {}
-    }
+        const res = await fetch("/api/display", { cache: "no-store" });
+        if (res.ok) {
+          const result = await res.json();
+          setData(result);
+          setConnected(true);
+          setLastUpdate(new Date());
+        }
+      } catch (err) {
+        console.error("Display fetch error:", err);
+        setConnected(false);
+      }
+    };
+
+    // Initial fetch
+    fetchDisplay();
+
+    // Poll every 3 seconds
+    intervalRef.current = setInterval(fetchDisplay, 3000);
 
     return () => {
-      channel.close();
-      window.removeEventListener("storage", handleStorage);
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, []);
 
@@ -90,13 +66,34 @@ export default function CustomerDisplayPage() {
   const total = subtotal + tax;
 
   // Show order confirmation screen
-  if (data.lastOrder) {
+  if (data.lastOrder && data.lastOrder.status === "completed") {
     return (
       <div className="min-h-screen bg-surface-200 flex flex-col items-center justify-center p-6">
         <div className="bento-card-lg text-center max-w-md w-full">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-green-50 border border-green-200 flex items-center justify-center">
             <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-text">Terima Kasih!</h1>
+          <p className="text-4xl sm:text-5xl font-bold text-primary-700 my-4">#{data.lastOrder.orderNumber}</p>
+          <p className="text-base sm:text-lg font-semibold text-text-secondary">
+            Total: Rp {data.lastOrder.total.toLocaleString("id-ID")}
+          </p>
+          <p className="text-sm text-text-muted mt-3">Pesanan selesai. Terima kasih!</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show "preparing" screen
+  if (data.lastOrder && (data.lastOrder.status === "pending" || data.lastOrder.status === "preparing")) {
+    return (
+      <div className="min-h-screen bg-surface-200 flex flex-col items-center justify-center p-6">
+        <div className="bento-card-lg text-center max-w-md w-full">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center">
+            <svg className="w-8 h-8 text-amber-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-text">Pesanan Diterima!</h1>
@@ -121,7 +118,7 @@ export default function CustomerDisplayPage() {
         <div className="flex items-center justify-center gap-2 mt-1">
           <div className={`w-2 h-2 rounded-full ${connected ? "bg-green-500" : "bg-amber-400 animate-pulse"}`} />
           <p className="text-xs sm:text-sm text-text-muted">
-            {connected ? "Terhubung dengan Kasir" : "Menunggu koneksi kasir..."}
+            {connected ? "Terhubung" : "Menghubungkan..."}
           </p>
         </div>
       </div>
@@ -151,19 +148,11 @@ export default function CustomerDisplayPage() {
               <div className="space-y-2 sm:space-y-3">
                 {data.cart.map((item, idx) => (
                   <div key={item.id || idx}
-                    className="flex justify-between items-center p-3 sm:p-4 rounded-xl bg-primary-50 border border-primary-100/40 animate-fade-in">
+                    className="flex justify-between items-center p-3 sm:p-4 rounded-xl bg-primary-50 border border-primary-100/40">
                     <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                       <span className="text-xl sm:text-2xl flex-shrink-0">{item.product.image}</span>
                       <div className="min-w-0">
                         <div className="font-medium text-sm sm:text-base text-text truncate">{item.product.name}</div>
-                        {item.selectedVariations && item.selectedVariations.length > 0 && (
-                          <div className="text-xs text-primary-600 truncate">
-                            {item.selectedVariations.map((v) => {
-                              const variation = item.product.variations?.find((pv) => pv.id === v.variationId);
-                              return variation?.options.find((o) => o.id === v.optionId)?.label;
-                            }).join(", ")}
-                          </div>
-                        )}
                       </div>
                     </div>
                     <div className="text-right flex-shrink-0 ml-3">

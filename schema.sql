@@ -188,3 +188,17 @@ INSERT INTO customers (id, name, phone, loyalty_points, total_spent, visit_count
 ('c1', 'Budi Santoso', '08123456789', 250, 500000, 12),
 ('c2', 'Siti Rahayu', '08234567890', 180, 360000, 8),
 ('c3', 'Ahmad Wijaya', '08345678901', 420, 840000, 20);
+
+
+-- Display cart (for real-time customer display across devices)
+CREATE TABLE IF NOT EXISTS display_cart (
+  id VARCHAR(100) PRIMARY KEY,
+  product_id VARCHAR(50) NOT NULL,
+  product_name VARCHAR(255) NOT NULL,
+  product_price DECIMAL(12,2) NOT NULL DEFAULT 0,
+  product_image VARCHAR(10) DEFAULT '',
+  quantity INT NOT NULL DEFAULT 1,
+  subtotal DECIMAL(12,2) NOT NULL DEFAULT 0,
+  selected_variations JSON,
+  added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

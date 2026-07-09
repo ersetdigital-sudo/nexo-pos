@@ -239,47 +239,59 @@ export const useStore = create<POSStore>()((set, get) => ({
     api(`/api/products?id=${id}`, { method: "DELETE" }).catch(console.error);
   },
 
-  // Cart (local only)
+  // Cart (syncs to display API for cross-device customer display)
   cart: [],
   addToCart: (product, variations) => set((state) => {
     const existingItem = state.cart.find(
       (item) => item.product.id === product.id && JSON.stringify(item.selectedVariations) === JSON.stringify(variations)
     );
+    let newCart;
     if (existingItem) {
-      return {
-        cart: state.cart.map((item) =>
-          item.id === existingItem.id
-            ? { ...item, quantity: item.quantity + 1, subtotal: (item.quantity + 1) * product.price }
-            : item
-        ),
+      newCart = state.cart.map((item) =>
+        item.id === existingItem.id
+          ? { ...item, quantity: item.quantity + 1, subtotal: (item.quantity + 1) * product.price }
+          : item
+      );
+    } else {
+      const variationAdjustment = variations?.reduce((acc, v) => {
+        const variation = product.variations?.find((pv) => pv.id === v.variationId);
+        const option = variation?.options.find((o) => o.id === v.optionId);
+        return acc + (option?.priceAdjustment || 0);
+      }, 0) || 0;
+      const newItem: CartItem = {
+        id: `cart-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        product,
+        quantity: 1,
+        selectedVariations: variations,
+        subtotal: product.price + variationAdjustment,
       };
+      newCart = [...state.cart, newItem];
     }
-    const variationAdjustment = variations?.reduce((acc, v) => {
-      const variation = product.variations?.find((pv) => pv.id === v.variationId);
-      const option = variation?.options.find((o) => o.id === v.optionId);
-      return acc + (option?.priceAdjustment || 0);
-    }, 0) || 0;
-    const newItem: CartItem = {
-      id: `cart-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      product,
-      quantity: 1,
-      selectedVariations: variations,
-      subtotal: product.price + variationAdjustment,
-    };
-    return { cart: [...state.cart, newItem] };
+    // Sync to display API
+    api("/api/display/cart", { method: "POST", body: JSON.stringify({ cart: newCart }) }).catch(console.error);
+    return { cart: newCart };
   }),
 
-  removeFromCart: (itemId) => set((state) => ({ cart: state.cart.filter((item) => item.id !== itemId) })),
+  removeFromCart: (itemId) => set((state) => {
+    const newCart = state.cart.filter((item) => item.id !== itemId);
+    api("/api/display/cart", { method: "POST", body: JSON.stringify({ cart: newCart }) }).catch(console.error);
+    return { cart: newCart };
+  }),
 
-  updateCartQuantity: (itemId, quantity) => set((state) => ({
-    cart: quantity <= 0
+  updateCartQuantity: (itemId, quantity) => set((state) => {
+    const newCart = quantity <= 0
       ? state.cart.filter((item) => item.id !== itemId)
       : state.cart.map((item) =>
           item.id === itemId ? { ...item, quantity, subtotal: quantity * (item.subtotal / item.quantity) } : item
-        ),
-  })),
+        );
+    api("/api/display/cart", { method: "POST", body: JSON.stringify({ cart: newCart }) }).catch(console.error);
+    return { cart: newCart };
+  }),
 
-  clearCart: () => set({ cart: [] }),
+  clearCart: () => {
+    set({ cart: [] });
+    api("/api/display/cart", { method: "DELETE" }).catch(console.error);
+  },
 
   // Orders
   orders: [],
