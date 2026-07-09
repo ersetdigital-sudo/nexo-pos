@@ -36,31 +36,34 @@ export default function CashierPage() {
 
   useEffect(() => {
     channelRef.current = new BroadcastChannel("nexo-pos-display");
-
-    // Send store info on connect
-    channelRef.current.postMessage({
-      type: "STORE_INFO",
-      storeName: "Nexo POS",
-      taxRate,
-    });
-
-    // Listen for data requests from customer display
     channelRef.current.onmessage = (event) => {
       if (event.data.type === "REQUEST_DATA") {
         channelRef.current?.postMessage({ type: "CART_UPDATE", cart });
       }
     };
-
     return () => { channelRef.current?.close(); };
   }, []);
 
-  // Broadcast cart updates whenever cart changes
+  // Sync cart to display API + BroadcastChannel whenever cart changes
   useEffect(() => {
     if (channelRef.current) {
       channelRef.current.postMessage({ type: "CART_UPDATE", cart });
     }
-    // Also save to localStorage for cross-tab fallback
     localStorage.setItem("nexo-display-cart", JSON.stringify(cart));
+
+    // Sync to database for cross-device display
+    const displayCart = cart.map((item) => ({
+      id: item.id,
+      product: { id: item.product.id, name: item.product.name, price: item.product.price, image: item.product.image || "" },
+      quantity: item.quantity,
+      subtotal: item.subtotal,
+      selectedVariations: item.selectedVariations,
+    }));
+    fetch("/api/display/cart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cart: displayCart }),
+    }).catch(console.error);
   }, [cart]);
 
   const subtotal = cart.reduce((sum, item) => sum + item.subtotal, 0);
