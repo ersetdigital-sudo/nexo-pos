@@ -2,26 +2,14 @@ import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 
+// Disable caching for this route
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 // GET current display data (active cart + latest order)
 export async function GET() {
   try {
-    // Get the most recent active/pending order (last 5 minutes)
-    const [recentOrders] = await pool.query<RowDataPacket[]>(
-      `SELECT * FROM orders 
-       WHERE status IN ('pending', 'preparing') 
-       AND created_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
-       ORDER BY created_at DESC LIMIT 1`
-    );
-
-    // Get last completed order (for "thank you" screen)
-    const [lastCompleted] = await pool.query<RowDataPacket[]>(
-      `SELECT * FROM orders 
-       WHERE status = 'completed' 
-       AND completed_at >= DATE_SUB(NOW(), INTERVAL 2 MINUTE)
-       ORDER BY completed_at DESC LIMIT 1`
-    );
-
-    // Get current cart from display_cart table (live cart being built)
+    // Get current cart from display_cart table
     const [cartRows] = await pool.query<RowDataPacket[]>(
       "SELECT * FROM display_cart ORDER BY added_at DESC"
     );
@@ -35,6 +23,22 @@ export async function GET() {
       settings[row.setting_key] = row.setting_value;
     });
 
+    // Get last completed order (for "thank you" screen, last 2 min)
+    const [lastCompleted] = await pool.query<RowDataPacket[]>(
+      `SELECT * FROM orders 
+       WHERE status = 'completed' 
+       AND completed_at >= DATE_SUB(NOW(), INTERVAL 2 MINUTE)
+       ORDER BY completed_at DESC LIMIT 1`
+    );
+
+    // Get recent pending/preparing order (for "processing" screen)
+    const [recentOrders] = await pool.query<RowDataPacket[]>(
+      `SELECT * FROM orders 
+       WHERE status IN ('pending', 'preparing') 
+       AND created_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+       ORDER BY created_at DESC LIMIT 1`
+    );
+
     let lastOrder = null;
     if (lastCompleted.length > 0) {
       lastOrder = {
@@ -42,28 +46,11 @@ export async function GET() {
         total: Number(lastCompleted[0].total),
         status: lastCompleted[0].status,
       };
-    } else if (recentOrders.length > 0) {
-      // Get items for recent active order
-      const [orderItems] = await pool.query<RowDataPacket[]>(
-        "SELECT * FROM order_items WHERE order_id = ?",
-        [recentOrders[0].id]
-      );
-
+    } else if (recentOrders.length > 0 && cartRows.length === 0) {
       lastOrder = {
         orderNumber: recentOrders[0].order_number,
         total: Number(recentOrders[0].total),
         status: recentOrders[0].status,
-        items: orderItems.map((item) => ({
-          id: item.id,
-          product: {
-            id: item.product_id,
-            name: item.product_name,
-            price: Number(item.product_price),
-            image: "",
-          },
-          quantity: item.quantity,
-          subtotal: Number(item.subtotal),
-        })),
       };
     }
 
@@ -86,14 +73,24 @@ export async function GET() {
       storeName: settings.store_name || "Dapur Bunda",
       taxRate: parseFloat(settings.tax_rate || "0.11"),
       lastOrder,
+    }, {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+      },
     });
-  } catch (error) {
-    console.error("GET /api/display error:", error);
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error("GET /api/display error:", errMsg);
     return NextResponse.json({
       cart: [],
       storeName: "Dapur Bunda",
       taxRate: 0.11,
       lastOrder: null,
+      _error: errMsg,
+    }, {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+      },
     });
   }
 }
