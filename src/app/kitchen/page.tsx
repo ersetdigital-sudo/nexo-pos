@@ -1,10 +1,21 @@
 "use client";
 
+import { useEffect } from "react";
 import { useStore } from "@/store";
 import { IconClock, IconCheck, IconFire } from "@/components/Icons";
 
 export default function KitchenPage() {
-  const { orders, updateOrderStatus } = useStore();
+  const { orders, updateOrderStatus, initializeStore } = useStore();
+
+  // Poll for new orders every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetch("/api/orders").then(r => r.json()).then((data) => {
+        useStore.setState({ orders: data.map((o: any) => ({ ...o, createdAt: new Date(o.createdAt) })) });
+      }).catch(console.error);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const kitchenOrders = orders.filter(
     (o) => o.status === "pending" || o.status === "preparing"

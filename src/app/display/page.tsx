@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MainLayout from "@/components/MainLayout";
 import { useStore } from "@/store";
 import { IconCustomerDisplay, IconQueue, IconKitchen, IconClock, IconCheck, IconFire, IconCart } from "@/components/Icons";
@@ -9,6 +9,16 @@ type Tab = "customer" | "queue" | "kitchen";
 
 export default function DisplayPage() {
   const [activeTab, setActiveTab] = useState<Tab>("queue");
+
+  // Poll for new orders every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetch("/api/orders").then(r => r.json()).then((data) => {
+        useStore.setState({ orders: data.map((o: any) => ({ ...o, createdAt: new Date(o.createdAt) })) });
+      }).catch(console.error);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const tabs = [
     { id: "queue" as Tab, label: "Antrian", icon: IconQueue },
