@@ -267,14 +267,28 @@ export const useStore = create<POSStore>()((set, get) => ({
       };
       newCart = [...state.cart, newItem];
     }
-    // Sync to display API
-    api("/api/display/cart", { method: "POST", body: JSON.stringify({ cart: newCart }) }).catch(console.error);
+    // Sync to display API (simplified payload)
+    const displayCart = newCart.map((item) => ({
+      id: item.id,
+      product: { id: item.product.id, name: item.product.name, price: item.product.price, image: item.product.image || "" },
+      quantity: item.quantity,
+      subtotal: item.subtotal,
+      selectedVariations: item.selectedVariations,
+    }));
+    fetch("/api/display/cart", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ cart: displayCart }) }).catch(console.error);
     return { cart: newCart };
   }),
 
   removeFromCart: (itemId) => set((state) => {
     const newCart = state.cart.filter((item) => item.id !== itemId);
-    api("/api/display/cart", { method: "POST", body: JSON.stringify({ cart: newCart }) }).catch(console.error);
+    const displayCart = newCart.map((item) => ({
+      id: item.id,
+      product: { id: item.product.id, name: item.product.name, price: item.product.price, image: item.product.image || "" },
+      quantity: item.quantity,
+      subtotal: item.subtotal,
+      selectedVariations: item.selectedVariations,
+    }));
+    fetch("/api/display/cart", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ cart: displayCart }) }).catch(console.error);
     return { cart: newCart };
   }),
 
@@ -284,13 +298,20 @@ export const useStore = create<POSStore>()((set, get) => ({
       : state.cart.map((item) =>
           item.id === itemId ? { ...item, quantity, subtotal: quantity * (item.subtotal / item.quantity) } : item
         );
-    api("/api/display/cart", { method: "POST", body: JSON.stringify({ cart: newCart }) }).catch(console.error);
+    const displayCart = newCart.map((item) => ({
+      id: item.id,
+      product: { id: item.product.id, name: item.product.name, price: item.product.price, image: item.product.image || "" },
+      quantity: item.quantity,
+      subtotal: item.subtotal,
+      selectedVariations: item.selectedVariations,
+    }));
+    fetch("/api/display/cart", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ cart: displayCart }) }).catch(console.error);
     return { cart: newCart };
   }),
 
   clearCart: () => {
     set({ cart: [] });
-    api("/api/display/cart", { method: "DELETE" }).catch(console.error);
+    fetch("/api/display/cart", { method: "DELETE" }).catch(console.error);
   },
 
   // Orders
