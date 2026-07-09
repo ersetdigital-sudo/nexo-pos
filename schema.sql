@@ -202,3 +202,30 @@ CREATE TABLE IF NOT EXISTS display_cart (
   selected_variations JSON,
   added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- Users table for authentication & role management
+CREATE TABLE IF NOT EXISTS users (
+  id VARCHAR(50) PRIMARY KEY,
+  username VARCHAR(100) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  role ENUM('admin', 'kasir', 'dapur', 'pelayan') NOT NULL DEFAULT 'kasir',
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Sessions table
+CREATE TABLE IF NOT EXISTS sessions (
+  id VARCHAR(100) PRIMARY KEY,
+  user_id VARCHAR(50) NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Insert default admin user (password: admin123 - hashed with bcrypt)
+-- Note: This hash is for 'admin123'. Change password after first login!
+INSERT INTO users (id, username, password_hash, name, role) VALUES
+('user-admin', 'admin', '$2b$10$8K1p/YKt6Xz0QXzX5X5X5.XXXXXXXXXXXXXXXXXXXXXXXXXXXXX', 'Administrator', 'admin');

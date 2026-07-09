@@ -155,6 +155,7 @@ export default function SettingsPage() {
     { id: "whatsapp", label: "WhatsApp", Icon: IconWhatsapp },
     { id: "barcode", label: "Barcode", Icon: IconBarcode },
     { id: "scanner", label: "Scanner", Icon: IconScanner },
+    { id: "users", label: "Pengguna", Icon: IconSettings },
   ];
 
   return (
@@ -440,8 +441,154 @@ export default function SettingsPage() {
             </div>
           )}
 
+          {activeTab === "users" && <UsersManagement />}
+
         </div>
       </div>
     </MainLayout>
+  );
+}
+
+/* ==================== USERS MANAGEMENT ==================== */
+function UsersManagement() {
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editUser, setEditUser] = useState<any>(null);
+  const [form, setForm] = useState({ username: "", password: "", name: "", role: "kasir" });
+  const [msg, setMsg] = useState("");
+
+  const fetchUsers = () => {
+    fetch("/api/users").then(r => r.json()).then((data) => {
+      if (Array.isArray(data)) setUsers(data);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  };
+
+  useEffect(() => { fetchUsers(); }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMsg("");
+
+    if (editUser) {
+      // Update
+      const body: any = { id: editUser.id, name: form.name, role: form.role };
+      if (form.password) body.password = form.password;
+      const res = await fetch("/api/users", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (res.ok) { setMsg("User berhasil diupdate!"); setShowForm(false); setEditUser(null); fetchUsers(); }
+      else setMsg(data.error || "Gagal update");
+    } else {
+      // Create
+      if (!form.password) { setMsg("Password wajib diisi"); return; }
+      const res = await fetch("/api/users", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+      const data = await res.json();
+      if (res.ok) { setMsg("User berhasil ditambahkan!"); setShowForm(false); setForm({ username: "", password: "", name: "", role: "kasir" }); fetchUsers(); }
+      else setMsg(data.error || "Gagal tambah user");
+    }
+  };
+
+  const handleEdit = (user: any) => {
+    setEditUser(user);
+    setForm({ username: user.username, password: "", name: user.name, role: user.role });
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id: string, username: string) => {
+    if (!confirm(`Hapus user "${username}"?`)) return;
+    await fetch(`/api/users?id=${id}`, { method: "DELETE" });
+    fetchUsers();
+  };
+
+  const handleToggleActive = async (user: any) => {
+    await fetch("/api/users", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: user.id, is_active: !user.is_active }) });
+    fetchUsers();
+  };
+
+  const roleLabels: Record<string, string> = { admin: "Admin", kasir: "Kasir", dapur: "Dapur", pelayan: "Pelayan" };
+  const roleBadges: Record<string, string> = { admin: "badge-primary", kasir: "badge-success", dapur: "badge-warning", pelayan: "badge-secondary" };
+
+  return (
+    <div className="bento-card-lg !p-4 sm:!p-6">
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <div>
+          <h2 className="text-lg sm:text-xl font-bold text-text">Kelola Pengguna</h2>
+          <p className="text-xs text-text-muted mt-0.5">Tambah, ubah password, atau hapus user</p>
+        </div>
+        <button onClick={() => { setShowForm(true); setEditUser(null); setForm({ username: "", password: "", name: "", role: "kasir" }); }}
+          className="btn-primary text-xs sm:text-sm py-2 px-3 min-h-[40px]">+ Tambah User</button>
+      </div>
+
+      {msg && <div className="p-3 rounded-lg bg-primary-50 border border-primary-200 text-sm text-primary-800 font-medium mb-4">{msg}</div>}
+
+      {/* Form */}
+      {showForm && (
+        <form onSubmit={handleSubmit} className="p-4 rounded-xl bg-surface-200 border border-line mb-4 space-y-3">
+          <h3 className="font-semibold text-sm text-text">{editUser ? "Edit User" : "Tambah User Baru"}</h3>
+          {!editUser && (
+            <div>
+              <label className="block text-xs font-medium text-text-secondary mb-1">Username</label>
+              <input className="input text-sm" placeholder="username" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} required />
+            </div>
+          )}
+          <div>
+            <label className="block text-xs font-medium text-text-secondary mb-1">Nama Lengkap</label>
+            <input className="input text-sm" placeholder="Nama" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-text-secondary mb-1">{editUser ? "Password Baru (kosongkan jika tidak diubah)" : "Password"}</label>
+            <input className="input text-sm" type="password" placeholder="Password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} {...(!editUser ? { required: true } : {})} />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-text-secondary mb-1">Role</label>
+            <select className="input text-sm" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
+              <option value="admin">Admin</option>
+              <option value="kasir">Kasir</option>
+              <option value="dapur">Dapur</option>
+              <option value="pelayan">Pelayan</option>
+            </select>
+          </div>
+          <div className="flex gap-2">
+            <button type="submit" className="btn-success text-xs py-2 px-4 min-h-[36px]">{editUser ? "Simpan Perubahan" : "Tambah"}</button>
+            <button type="button" onClick={() => { setShowForm(false); setEditUser(null); }} className="btn-outline text-xs py-2 px-4 min-h-[36px]">Batal</button>
+          </div>
+        </form>
+      )}
+
+      {/* Users list */}
+      {loading ? (
+        <p className="text-sm text-text-muted text-center py-8">Memuat...</p>
+      ) : (
+        <div className="space-y-2">
+          {users.map((user) => (
+            <div key={user.id} className={`flex items-center justify-between p-3 rounded-xl border ${user.is_active ? "bg-white border-line" : "bg-surface-200 border-line opacity-60"}`}>
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-lg bg-primary-100 flex items-center justify-center text-xs font-bold text-primary-700 flex-shrink-0">
+                  {user.name?.charAt(0)?.toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-medium text-sm text-text truncate">{user.name}</p>
+                  <p className="text-xs text-text-muted">@{user.username}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <span className={`badge text-[10px] ${roleBadges[user.role] || "badge-neutral"}`}>{roleLabels[user.role] || user.role}</span>
+                <button onClick={() => handleEdit(user)} className="p-1.5 rounded-lg hover:bg-primary-50 text-text-muted hover:text-primary-600" title="Edit">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                </button>
+                <button onClick={() => handleToggleActive(user)} className={`p-1.5 rounded-lg ${user.is_active ? "hover:bg-amber-50 text-text-muted hover:text-amber-600" : "hover:bg-green-50 text-text-muted hover:text-green-600"}`} title={user.is_active ? "Nonaktifkan" : "Aktifkan"}>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d={user.is_active ? "M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" : "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"} /></svg>
+                </button>
+                <button onClick={() => handleDelete(user.id, user.username)} className="p-1.5 rounded-lg hover:bg-red-50 text-text-muted hover:text-red-500" title="Hapus">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+              </div>
+            </div>
+          ))}
+          {users.length === 0 && <p className="text-sm text-text-muted text-center py-8">Belum ada user. Tambahkan user pertama.</p>}
+        </div>
+      )}
+    </div>
   );
 }

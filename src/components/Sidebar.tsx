@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
+import { useAuth, hasAccess } from "@/lib/useAuth";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -18,6 +19,7 @@ import {
   Zap,
   ChevronsLeft,
   ChevronsRight,
+  LogOut,
 } from "lucide-react";
 
 const menuItems = [
@@ -44,6 +46,12 @@ export default function Sidebar({
   onToggleCollapse?: () => void;
 }) {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
+
+  // Filter menu items based on role
+  const visibleMenuItems = user
+    ? menuItems.filter((item) => hasAccess(user.role, item.href))
+    : menuItems;
 
   return (
     <aside
@@ -66,7 +74,7 @@ export default function Sidebar({
 
       {/* Navigation */}
       <nav className="flex-1 px-3 space-y-1.5 overflow-y-auto scrollbar-hide">
-        {menuItems.map((item) => {
+        {visibleMenuItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
           return (
@@ -108,6 +116,28 @@ export default function Sidebar({
           );
         })}
       </nav>
+
+      {/* User info + Logout */}
+      {user && (
+        <div className={`px-3 py-2 ${collapsed ? "text-center" : ""}`}>
+          {!collapsed && (
+            <div className="px-3 py-2 rounded-lg bg-surface-200 mb-2">
+              <p className="text-xs font-semibold text-text truncate">{user.name}</p>
+              <p className="text-[10px] text-text-muted capitalize">{user.role}</p>
+            </div>
+          )}
+          <button
+            onClick={logout}
+            className={`w-full flex items-center ${
+              collapsed ? "justify-center" : "gap-3 px-3"
+            } py-2 rounded-xl text-xs font-medium text-red-500 hover:bg-red-50 transition-colors min-h-[40px]`}
+            title="Keluar"
+          >
+            <LogOut className="w-4 h-4" />
+            {!collapsed && <span>Keluar</span>}
+          </button>
+        </div>
+      )}
 
       {/* Collapse toggle (desktop only) */}
       {onToggleCollapse && (
