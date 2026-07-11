@@ -11,6 +11,9 @@ const PUBLIC_ROUTES = [
   "/api/display/cart",
 ];
 
+// Exact public paths (not prefix-matched)
+const PUBLIC_EXACT = ["/"];
+
 // Role-based access control
 const ROLE_ACCESS: Record<string, string[]> = {
   admin: ["*"], // all access
@@ -24,6 +27,11 @@ export function middleware(request: NextRequest) {
 
   // Allow public routes
   if (PUBLIC_ROUTES.some((route) => pathname.startsWith(route))) {
+    return NextResponse.next();
+  }
+
+  // Allow exact public paths
+  if (PUBLIC_EXACT.includes(pathname)) {
     return NextResponse.next();
   }
 
