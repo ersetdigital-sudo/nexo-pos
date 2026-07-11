@@ -37,7 +37,7 @@ export default function LoginPage() {
       } else if (role === "pelayan") {
         router.push("/queue");
       } else {
-        router.push("/");
+        router.push("/dashboard");
       }
     } catch (err) {
       setError("Terjadi kesalahan. Coba lagi.");

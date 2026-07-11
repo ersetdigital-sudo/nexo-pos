@@ -56,7 +56,7 @@ function MobileBottomNav() {
   const pathname = usePathname();
 
   const items = [
-    { href: "/", label: "Home", icon: LayoutDashboard },
+    { href: "/dashboard", label: "Home", icon: LayoutDashboard },
     { href: "/cashier", label: "Kasir", icon: ShoppingBag },
     { href: "/display", label: "Display", icon: MonitorSmartphone },
     { href: "/orders", label: "Riwayat", icon: History },

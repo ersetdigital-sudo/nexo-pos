@@ -126,7 +126,7 @@ export default function CashierPage() {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
         <div className="h-14 bg-white border-b border-primary-100/60 flex items-center justify-between px-3 sm:px-5 flex-shrink-0">
-          <Link href="/" className="btn-ghost text-sm py-2 px-2 sm:px-3 min-h-[44px]">
+          <Link href="/dashboard" className="btn-ghost text-sm py-2 px-2 sm:px-3 min-h-[44px]">
             <IconChevronLeft className="w-4 h-4" /> <span className="hidden sm:inline">Kembali</span>
           </Link>
           <h1 className="text-base sm:text-lg font-semibold text-text">Kasir</h1>
